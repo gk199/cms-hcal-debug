@@ -92,8 +92,8 @@ cd CMSSW_10_3_1/src \
 cmsenv \
 git cms-init \
 git cms-merge-topic --unsafe georgia14:upgradedTPs-depthinfo \
-git clone git@github.com:cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug \
+git clone git@github.com:cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug 
 
-scram b -j 4 \
+scram b -j 4 
 
 See an example config file in test/analyze_325170.py
