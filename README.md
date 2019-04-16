@@ -84,3 +84,16 @@ This will run a DAS command to find the appropriate files before generating the 
 Local runs are based on `HcalTBSource` rather than `PoolSource` input and so cannot currently be analyzed with `cmsDriver.py` commands, but the `one_run.py` script can be used with the `-t local` option provides an alternative:
 
     ./one_run.py -r 312717 -t local
+
+## Analyzing TPs with depth-info
+
+cmsrel CMSSW_10_3_1
+cd CMSSW_10_3_1/src
+cmsenv
+git cms-init
+git cms-merge-topic --unsafe georgia14:upgradedTPs-depthinfo
+git clone git@github.com:cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug
+
+scram b -j 4
+
+See an example config file in test/analyze_325170.py
