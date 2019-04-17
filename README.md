@@ -87,13 +87,13 @@ Local runs are based on `HcalTBSource` rather than `PoolSource` input and so can
 
 ## Analyzing TPs with depth-info
 
-cmsrel CMSSW_10_3_1 \
-cd CMSSW_10_3_1/src \
-cmsenv \
-git cms-init \
-git cms-merge-topic --unsafe georgia14:upgradedTPs-depthinfo \
-git clone git@github.com:cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug 
+    cmsrel CMSSW_10_3_1 
+    cd CMSSW_10_3_1/src 
+    cmsenv 
+    git cms-init 
+    git cms-merge-topic --unsafe georgia14:upgradedTPs-depthinfo 
+    git clone git@github.com:cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug 
 
-scram b -j 4 
+    scram b -j 4 
 
 See an example config file in test/analyze_325170.py
