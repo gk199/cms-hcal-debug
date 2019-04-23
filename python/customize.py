@@ -107,7 +107,7 @@ def compare_tp_reco(process, name, tag_tp, tag_df, sev):
     process.load("RecoLocalCalo.HcalRecAlgos.hcalRecAlgoESProd_cfi")
     add_fileservice(process)
     add_path(process)
-    setattr(process, name, cms.EDAnalyzer("HcalCompareUpgradeChains",
+    setattr(process, name, cms.EDAnalyzer("HcalCompareLegacyChains",
                                           triggerPrimitives=cms.InputTag(tag_tp),
                                           recHits=cms.VInputTag('hbheprereco', 'hfreco'),
                                           dataFrames=cms.VInputTag(cms.InputTag(tag_df), cms.InputTag(tag_df)),
