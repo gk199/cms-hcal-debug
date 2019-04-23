@@ -68,7 +68,7 @@ process.simHcalTriggerPrimitiveDigis.upgrade = cms.bool(True)
 
 # Other statements
 from Configuration.AlCa.GlobalTag import GlobalTag
-process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_HLT_v7', '')
+process.GlobalTag = GlobalTag(process.GlobalTag, '101X_dataRun2_Prompt_v11', '')
 
 process.dump = cms.EDAnalyzer("EventContentAnalyzer") 
 
