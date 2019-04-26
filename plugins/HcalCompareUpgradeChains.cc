@@ -12,8 +12,8 @@
      [Notes on implementation]
 */
 //
-// Original Author:  matthias wolf
-//         Created:  Fri Aug 26 11:37:21 CDT 2013
+// Original Author:  matthias wolf & georgia karapostoli
+//         Created:  Fri Aug 26 11:37:21 CDT 2013, 2019 
 // $Id$
 //
 //
@@ -115,17 +115,19 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       int tp_depth_end_;
 
       double tpsplit_energy_;
-  // double tpsplit_oot_;
+
+      double tpsplit_oot_;
+      
       int tpsplit_ieta_;
       int tpsplit_iphi_;
       int tpsplit_depth_;
       double tpsplit_ettot_;
-  /*
+
       double tpsplit_rise_avg_;
       double tpsplit_rise_rms_;
       double tpsplit_fall_avg_;
       double tpsplit_fall_rms_;
-  */
+
       double ev_rh_energy_;
       double ev_tp_energy_;
       int ev_rh_unmatched_;
@@ -177,17 +179,16 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
 
    tpsplit_ = fs->make<TTree>("tpsplit", "Trigger primitives");
    tpsplit_->Branch("et", &tpsplit_energy_);
-   //   tpsplit_->Branch("oot", &tpsplit_oot_);
+   tpsplit_->Branch("oot", &tpsplit_oot_);
    tpsplit_->Branch("ieta", &tpsplit_ieta_);
    tpsplit_->Branch("iphi", &tpsplit_iphi_);
    tpsplit_->Branch("depth", &tpsplit_depth_);
    tpsplit_->Branch("etsum", &tpsplit_ettot_);
-   /*
+
    tpsplit_->Branch("rise_avg", &tpsplit_rise_avg_);
    tpsplit_->Branch("rise_rms", &tpsplit_rise_rms_);
    tpsplit_->Branch("fall_avg", &tpsplit_fall_avg_);
    tpsplit_->Branch("fall_rms", &tpsplit_fall_rms_);
-   */
 
    events_ = fs->make<TTree>("events", "Event quantities");
    events_->Branch("RH_energy", &ev_rh_energy_);
@@ -361,7 +362,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       int et_max = 0;
       int et_sum = 0;
 
-      //      for (unsigned int i = 1; i < 6; ++i) {
       std::vector<int> energy_depth = digi.getDepthData();
       for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
 	//  int depth = digi.SOI_depth_linear(i);
@@ -383,21 +383,22 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       if (et_sum > 0) {
 	std::vector<int> energy_depth = digi.getDepthData();  
 	for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) { 
-	//	  for (unsigned int i = 1; i < 6; ++i) {
+
 	  int depth = energy_depth[i]; 
 	  //            int depth = digi.SOI_depth_linear(i);
             tpsplit_energy_ = tp_energy_ * float(depth) / et_sum;
-	    //            tpsplit_oot_ = tp_energy_ * float(digi.SOI_oot_linear(i)) / et_sum;
+	    tpsplit_oot_ = tp_energy_ * float(digi.SOI_oot_linear(i)) / et_sum;
+	    //	    std::cout << tpsplit_energy_ << std::endl; 
             tpsplit_ieta_ = tp_ieta_;
             tpsplit_iphi_ = tp_iphi_;
             tpsplit_depth_ = i;
             tpsplit_ettot_ = tp_energy_;
-	    /*
+
             tpsplit_rise_avg_ = digi.SOI_rising_avg(i);
             tpsplit_rise_rms_ = digi.SOI_rising_rms(i);
             tpsplit_fall_avg_ = digi.SOI_falling_avg(i);
             tpsplit_fall_rms_ = digi.SOI_falling_rms(i);
-	    */
+
             tpsplit_->Fill();
          }
       }
