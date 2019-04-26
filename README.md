@@ -85,13 +85,13 @@ Local runs are based on `HcalTBSource` rather than `PoolSource` input and so can
 
     ./one_run.py -r 312717 -t local
 
-## Analyzing TPs with depth-info
+## Analyzing TPs with depth/timing information
 
     cmsrel CMSSW_10_3_1 
     cd CMSSW_10_3_1/src 
     cmsenv 
     git cms-init 
-    git cms-merge-topic --unsafe georgia14:upgradedTPs-depthinfo 
+    git cms-merge-topic --unsafe georgia14:upgradeTPs-103X 
     git clone git@github.com:cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug 
 
 In python/customise.py, compare_tp_reco: replace 'HcalCompareLegacyChains' with 'HcalCompareUpgradeChains'.
