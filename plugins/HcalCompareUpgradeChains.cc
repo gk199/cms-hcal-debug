@@ -12,8 +12,8 @@
      [Notes on implementation]
 */
 //
-// Original Author:  matthias wolf & georgia karapostoli
-//         Created:  Fri Aug 26 11:37:21 CDT 2013, 2019 
+// Original Author:  matthias wolf
+//         Created:  Fri Aug 26 11:37:21 CDT 2013
 // $Id$
 //
 //
@@ -21,7 +21,8 @@
 
 // system include files
 #include <memory>
-
+#include <array>
+#include <algorithm>
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDAnalyzer.h"
@@ -115,9 +116,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       int tp_depth_end_;
 
       double tpsplit_energy_;
-
-      double tpsplit_oot_;
-      
+  double tpsplit_oot_;
       int tpsplit_ieta_;
       int tpsplit_iphi_;
       int tpsplit_depth_;
@@ -133,8 +132,12 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       int ev_rh_unmatched_;
       int ev_tp_unmatched_;
 
+      double mt_rh_energy0_;
       double mt_rh_energy_;
       double mt_tp_energy_;
+      double mt_rh_energy_depth0_[8] = {0.0};
+      double mt_rh_energy_depth_[8] = {0.0};
+      double mt_tp_energy_depth_[8] = {0.0};
 
       int mt_ieta_;
       int mt_iphi_;
@@ -197,8 +200,12 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    events_->Branch("TP_unmatched", &ev_tp_unmatched_);
 
    matches_ = fs->make<TTree>("matches", "Matched RH and TP");
+   matches_->Branch("RH_energyM0", &mt_rh_energy0_);
    matches_->Branch("RH_energy", &mt_rh_energy_);
    matches_->Branch("TP_energy", &mt_tp_energy_);
+   matches_->Branch("RH_energyM0_depth", mt_rh_energy_depth0_, "RH_energyM0_depth[8]/D");
+   matches_->Branch("RH_energy_depth", mt_rh_energy_depth_, "RH_energy_depth[8]/D");
+   matches_->Branch("TP_energy_depth", mt_tp_energy_depth_, "TP_energy_depth[8]/D");
    matches_->Branch("ieta", &mt_ieta_);
    matches_->Branch("iphi", &mt_iphi_);
 }
@@ -316,7 +323,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      return level <= max_severity_;
    };
 
-
    if (hits.isValid()) {
       for (auto& hit: *(hits.product())) {
          HcalDetId id(hit.id());
@@ -345,6 +351,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
    // setup.get<L1RCTParametersRcd>().get(rct);
    // const L1RCTParameters* r = rct.product();
 
+   //   printf("Before the tp digis loop...\n");
    for (const auto& digi: *digis) {
       HcalTrigTowerDetId id = digi.id();
       //      ev_tp_energy_ += decoder->hcaletValue(id.ieta(), id.iphi(), digi.SOI_compressedEt());
@@ -362,11 +369,15 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       int et_max = 0;
       int et_sum = 0;
 
+      if(tp_energy_<=0.5) continue; 
+
+      //printf("It is going to loop over depths now , and we are at TP with et = %f and ieta=%d, iphi=%d \n",tp_energy_,tp_ieta_,tp_iphi_);
       std::vector<int> energy_depth = digi.getDepthData();
       for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
-	//  int depth = digi.SOI_depth_linear(i);
-	int depth = energy_depth[i];
+//         printf("depth now is: %d ",i);
+         int depth = energy_depth[i];
 
+//	       printf(" SOI energy = %d \n",depth);
          if (depth > 0) {
             et_sum += depth;
             tp_depth_end_ = i;
@@ -381,11 +392,9 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       tps_->Fill();
 
       if (et_sum > 0) {
-	std::vector<int> energy_depth = digi.getDepthData();  
-	for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) { 
 
-	  int depth = energy_depth[i]; 
-	  //            int depth = digi.SOI_depth_linear(i);
+	  for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
+            int depth = energy_depth[i];
             tpsplit_energy_ = tp_energy_ * float(depth) / et_sum;
 	    tpsplit_oot_ = tp_energy_ * float(digi.SOI_oot_linear(i)) / et_sum;
 	    //	    std::cout << tpsplit_energy_ << std::endl; 
@@ -406,7 +415,9 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
    for (const auto& pair: tpdigis) {
 
+    //printf("************************************************************\n");
      auto id = pair.first;
+    //printf("Depth is: %d, eta is: %d, phi is: %d\n",id.depth(),id.ieta(),id.iphi());
 
      auto new_id(id);
      if (swap_iphi_ and id.version() == 1 and id.ieta() > 28 and id.ieta() < 40) {
@@ -420,7 +431,10 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       if (rh != rhits.end()) {
 	mt_ieta_ = new_id.ieta();//pair.first.ieta();
 	mt_iphi_ = new_id.iphi(); //pair.first.iphi();
+//  printf("************************************************************\n");
+//  printf("Eta is: %d, phi is: %d\n", mt_ieta_, mt_iphi_);
 	mt_tp_energy_ = 0;
+	memset(mt_tp_energy_depth_, 0, sizeof(mt_tp_energy_depth_));
 
 	for (const auto& tp: pair.second) {
 	  mt_tp_energy_ += decoder->hcaletValue(
@@ -428,16 +442,59 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 						//                  pair.first.iphi(),
 						new_id,//						pair.first,
 						tp.SOI_compressedEt());
+    std::vector<int> energy_depth = tp.getDepthData();
+    for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i)
+    {  
+      mt_tp_energy_depth_[i] += energy_depth[i];
+    }
+//    printf("Depth is: %d, eta is: %d, phi is: %d\n",tp.id().depth(),tp.id().ieta(),tp.id().iphi());
 	}
-	mt_rh_energy_ = 0.;
+  double sum = 0;
+  std::for_each(mt_tp_energy_depth_, mt_tp_energy_depth_ + 8, [&](double &i){ sum += i; });
+  std::for_each(mt_tp_energy_depth_, mt_tp_energy_depth_ + 8, [=](double &i){ 
+    if(sum != 0)
+      i = i / sum * mt_tp_energy_; 
+  });
+  /*
+  if (mt_tp_energy_ > 0){
+  for (int i=0; i<8; i++) {
+  printf(" %f",mt_tp_energy_depth_[i]);
+  }
+  printf(" TP total energy is=%f\n", mt_tp_energy_);
+  }
+  */
+  mt_rh_energy0_ = 0.;
+  mt_rh_energy_ = 0.;
+  memset(mt_rh_energy_depth0_, 0, sizeof(mt_rh_energy_depth0_));
+  memset(mt_rh_energy_depth_, 0, sizeof(mt_rh_energy_depth_));
+
 	for (const auto& hit: rh->second) {
 	  HcalDetId id(hit.id());
+	  auto depth = id.depth();
+	  //	  printf("RH: id.depth=%d and ieta=%d and iphi=%d\n",depth,id.ieta(),id.iphi());
+
 	  auto tower_ids = tpd_geo.towerIds(id);
 	  auto count = std::count_if(std::begin(tower_ids), std::end(tower_ids),
 				     [&](const auto& t) { return t.version() == new_id.version(); });
+//    printf("Count is %d\n", (int)count);
 	  //            const auto *local_geo = gen_geo_->getSubdetectorGeometry(id)->getGeometry(id);
+	  mt_rh_energy0_ += hit.eraw() / get_cosh(id) / count ; //cosh(local_geo->getPosition().eta());
 	  mt_rh_energy_ += hit.energy() / get_cosh(id) / count ; //cosh(local_geo->getPosition().eta());
+	  mt_rh_energy_depth0_[depth] += hit.eraw() / get_cosh(id) / count ; // / max_depth);
+	  mt_rh_energy_depth_[depth] += hit.energy() / get_cosh(id) / count ; // / max_depth);
 	}
+	
+//	double esum(0.);
+//	for (int i=0; i<8; i++) {
+//	    esum+=mt_rh_energy_depth0_[i];
+//      printf(" %f",mt_rh_energy_depth0_[i]);
+//	  }
+//	printf(" sum energy is: %f, original energy is=%f\n",esum,mt_rh_energy0_);    
+	
+//  if( mt_rh_energy_>0.5 && mt_tp_energy_>0.5 ){
+//  printf("RecHits: %f, %f, %f, %f, %f, %f, %f, %f, total: %f\n", mt_rh_energy_depth_[0], mt_rh_energy_depth_[1], mt_rh_energy_depth_[2], mt_rh_energy_depth_[3], mt_rh_energy_depth_[4], mt_rh_energy_depth_[5], mt_rh_energy_depth_[6], mt_rh_energy_depth_[7], mt_rh_energy_);
+//  printf("TPs:     %f, %f, %f, %f, %f, %f, %f, %f, total: %f\n", mt_tp_energy_depth_[0], mt_tp_energy_depth_[1], mt_tp_energy_depth_[2], mt_tp_energy_depth_[3], mt_tp_energy_depth_[4], mt_tp_energy_depth_[5], mt_tp_energy_depth_[6], mt_tp_energy_depth_[7], mt_tp_energy_);
+//  }
 	matches_->Fill();
 	rhits.erase(rh);
       } else {
