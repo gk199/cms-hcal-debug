@@ -99,3 +99,4 @@ In python/customise.py, compare_tp_reco: replace 'HcalCompareLegacyChains' with 
     scram b -j 4 
 
 See an example config file in test/analyze_325170.py
+There exist now upgradeTPs-104X, upgradeTPs-106X branches rebased in 104X, 106X respectively.  
