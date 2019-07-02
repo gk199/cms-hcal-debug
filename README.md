@@ -103,7 +103,8 @@ There exist now upgradeTPs-104X, upgradeTPs-106X branches rebased in 104X, 106X 
 
 ### Specifics for energy-depth information workflow
 Workflow (Gillian Kopp, June 2019):
-In /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit HcalCompareUpgradeChains.cc and analyze_run3.py. Compile and run with:
+
+Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit HcalCompareUpgradeChains.cc and analyze_run3.py. Compile and run with:
     
     scram b -j 4
     cd test
@@ -111,16 +112,16 @@ In /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit
     source runcrab3.sh
     cmsRun analyze_run3.py
 
-This will output "analyze.root" with TP trees (tps).
+This will output "analyze.root" with TP tree (tps).
 
-run.C makes histograms from ntuples resulting from cms-hcal-debug packages (analyze.root from previous file). This is set to do mode 1 (energy fraction vs. depth). Run this with:
+run.C makes histograms from ntuples resulting from cms-hcal-debug packages (analyze.root from previous file). This is currently set to do mode 1 (energy fraction vs. depth). Run this with:
 
     g++ -o run run.C  `root-config --cflags --glibs`
     ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/ output_histograms.root 1
 
 This will output "output_histograms.root", which is needed for the plotting step.
 
-Copy / move "output_histograms.root" and "analyze.root" to the FilesToPlot directory. plot_simple.py creates two root files, "output_histograms.root" and "output_histograms2.root" in the same directory as the script, and puts plots in /outPlots_fraction (many files).
+Copy "output_histograms.root" and "analyze.root" to the /FilesToPlot directory. plot_simple.py creates two root files, "output_histograms.root" and "output_histograms2.root" in the same directory as the script, and puts plots in /outPlots_fraction (many files).
 
     cmsenv
     python plot_simple.py /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/FilesToPlot/ compareReemulRecoSeverity9/tps 1
