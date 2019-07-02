@@ -17,7 +17,7 @@
 // $Id$
 //
 // Updates by: georgia karapostoli [2019]
-
+// Updated by: gillian kopp [2019] for TP studies with depth and timing information
 
 // system include files
 #include <memory>
@@ -118,23 +118,21 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       int tp_depth_max_;
       int tp_depth_start_;
       int tp_depth_end_;
-
+      double tp_energy_depth_[8] = {0.0};
       int tp_soi_;
-      double tpsplit_energy_;
-  
+
+      double tpsplit_energy_;  
       double tpsplit_oot_;
-      
       int tpsplit_ieta_;
       int tpsplit_iphi_;
       int tpsplit_depth_;
       double tpsplit_ettot_;
-
       double tpsplit_rise_avg_;
       double tpsplit_rise_rms_;
       double tpsplit_fall_avg_;
       double tpsplit_fall_rms_;
 
-  double ev_rh_energy0_;    
+      double ev_rh_energy0_;    
       double ev_rh_energy_;
       double ev_tp_energy_;
       int ev_rh_unmatched_;
@@ -198,6 +196,7 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tps_->Branch("depth_start", &tp_depth_start_);
    tps_->Branch("depth_end", &tp_depth_end_);
    tps_->Branch("soi", &tp_soi_);
+   tps_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
 
    tpsplit_ = fs->make<TTree>("tpsplit", "Trigger primitives");
    tpsplit_->Branch("et", &tpsplit_energy_);
@@ -208,13 +207,11 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsplit_->Branch("etsum", &tpsplit_ettot_);
    tpsplit_->Branch("soi", &tp_soi_);
    //   tpsplit_->Branch("nvtx", &ev_nvtx_);
-   
    tpsplit_->Branch("rise_avg", &tpsplit_rise_avg_);
    tpsplit_->Branch("rise_rms", &tpsplit_rise_rms_);
    tpsplit_->Branch("fall_avg", &tpsplit_fall_avg_);
    tpsplit_->Branch("fall_rms", &tpsplit_fall_rms_);
    
-
    events_ = fs->make<TTree>("events", "Event quantities");
    events_->Branch("RH_energy", &ev_rh_energy_);
    events_->Branch("TP_energy", &ev_tp_energy_);
@@ -254,7 +251,6 @@ HcalCompareUpgradeChains::beginLuminosityBlock(const edm::LuminosityBlock& lumi,
   setup.get<HcalSeverityLevelComputerRcd>().get(comp);
   comp_ = comp.product();
 }
-
 
 void
 HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup& setup)
@@ -428,10 +424,10 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       tp_energy_ = decoder->hcaletValue(id, digi.SOI_compressedEt());
       tp_ieta_ = id.ieta();
       tp_iphi_ = id.iphi();
-
       tp_depth_start_ = -1;
       tp_depth_end_ = -1;
       tp_depth_max_ = -1;
+      memset(tp_energy_depth_, 0, sizeof(tp_energy_depth_));
       int et_max = 0;
       int et_sum = 0;
 
@@ -440,6 +436,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       std::vector<int> energy_depth = digi.getDepthData();
       for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
          int depth = energy_depth[i];
+	 tp_energy_depth_[i] += energy_depth[i];
          if (depth > 0) {
             et_sum += depth;
             tp_depth_end_ = i;
@@ -451,6 +448,12 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
             }
          }
       }
+      double sum = 0;
+      std::for_each(tp_energy_depth_, tp_energy_depth_ + 8, [&](double &i){ sum += i; });
+      std::for_each(tp_energy_depth_, tp_energy_depth_ + 8, [=](double &i){ 
+	  if(sum != 0)
+	    i = i / sum * tp_energy_; 
+	});
 
       tp_soi_ = digi.SOI_compressedEt();
       tps_->Fill();
@@ -497,6 +500,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
        //  printf("Eta is: %d, phi is: %d\n", mt_ieta_, mt_iphi_);
        mt_tp_energy_ = 0;
        memset(mt_tp_energy_depth_, 0, sizeof(mt_tp_energy_depth_));
+
        mt_tp_soi_ = 0;
        for (const auto& tp: pair.second) {
 	 mt_tp_energy_ += decoder->hcaletValue( new_id, tp.SOI_compressedEt());
@@ -558,4 +562,4 @@ HcalCompareUpgradeChains::fillDescriptions(edm::ConfigurationDescriptions& descr
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(HcalCompareUpgradeChains);
-//#endif
+//#end
