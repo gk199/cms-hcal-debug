@@ -33,10 +33,17 @@ process.maxEvents = cms.untracked.PSet(
 # Input source
 process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
-        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/EF39EED5-3FED-7B4E-AAD2-0A33A9416A0D.root',
-        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/EB5DE19B-827A-C140-B813-1426AD296FCC.root',
-        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/E3C5FF84-AD89-F743-BC1E-02E039B91EDF.root',
-        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/E0857173-72F5-6347-9B22-F8A42FB4321F.root'
+#        QCD Files
+#        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/EF39EED5-3FED-7B4E-AAD2-0A33A9416A0D.root',
+#        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/EB5DE19B-827A-C140-B813-1426AD296FCC.root',
+#        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/E3C5FF84-AD89-F743-BC1E-02E039B91EDF.root',
+#        '/store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/E0857173-72F5-6347-9B22-F8A42FB4321F.root'
+#        tt bar Files
+        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/17BAFD99-C0D7-0848-BE74-C4B8E6CB00EE.root',
+        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/F7BF498F-2FCA-BF42-A9E7-8A6C214B159C.root',
+        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/BE268E78-7D2F-4D45-A040-36AE0D779BEB.root',
+        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/4CD90995-B77D-374C-AB65-8878FDDCB361.root'
+#        Other files
 #        '/store/data/Run2018D/ZeroBias/RAW/v1/000/325/170/00000/FF9E45DF-DC15-E749-8E0C-0EE9A37361CD.root',
 #        '/store/data/Run2018D/ZeroBias/RAW/v1/000/325/170/00000/FCF7B55F-2E54-7B4C-852C-559C2729B181.root',
 #        '/store/data/Run2018D/ZeroBias/RAW/v1/000/325/170/00000/FD51C341-E991-A547-82DD-46B9646B5622.root',

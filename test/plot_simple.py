@@ -59,11 +59,11 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/FilesToPlot/"
-path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/FilesToPlot/"
+path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/TTbar/"
+path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "output_histograms.root"
-out2 = "output_histograms2.root"
+out1 = "TTbar/output_histograms_TTbar.root"
+out2 = "QCD/output_histograms_QCD.root"
 
 # start defining functions
 def processData(path, out, mode):
@@ -221,8 +221,8 @@ c = r.TCanvas()
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 leg = r.TLegend(0.75,0.85,0.95,0.95)
-leg.AddEntry(Energy_Depth_t1_p,"QCD MC 1")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC 2")
+leg.AddEntry(Energy_Depth_t1_p,"TTbar MC")
+leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com.eps"
@@ -252,8 +252,8 @@ c = r.TCanvas()
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 leg = r.TLegend(0.75,0.85,0.95,0.95)
-leg.AddEntry(Energy_Depth_t1_p,"QCD MC 1")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC 2")
+leg.AddEntry(Energy_Depth_t1_p,"TTbar MC")
+leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com.eps"

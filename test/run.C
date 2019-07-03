@@ -16,7 +16,7 @@
 // to compile:
 // g++ -o run run.C  `root-config --cflags --glibs`
 // to run:
-// ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test output_histograms.root 1
+// ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/____/ output_histograms.root 1
 // the first argument is the directory where the output file analyze.root from the HcalCompareUpgradeChains is stored
 // the second is the name of the output file with histograms made from this macro
 
@@ -32,7 +32,7 @@ int main(int argc, char* argv[])
   if(argc!=Nparam+1)
   {
      std::cout << "main() : arcg = " << argc << " is different from " << Nparam+1 <<". Exiting." << std::endl;
-     std::cout << "Usage  : ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test output_histograms.root 1" << std::endl;
+     std::cout << "Usage  : ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/______/ output_histograms.root 1" << std::endl;
      exit (1);
   }
 
