@@ -104,7 +104,7 @@ There exist now upgradeTPs-104X, upgradeTPs-106X branches rebased in 104X, 106X 
 ### Specifics for energy-depth information workflow
 Workflow (Gillian Kopp, June 2019):
 
-Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit HcalCompareUpgradeChains.cc and analyze_run3.py. Compile and run with:
+Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit plugins/HcalCompareUpgradeChains.cc (for energy-depth, added "tp_energy_depth_[8]" to tps branch) and analyze_run3.py (list the MC ROOT files to use - currently set up with QCD and TTbar Run 3 MC files). Compile and run with:
     
     scram b -j 4
     cd test
@@ -112,16 +112,21 @@ Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDeb
     source runcrab3.sh
     cmsRun analyze_run3.py
 
-This will output "analyze.root" with TP tree (tps).
+This will output "analyze.root" with TP (tps branch). Move to QCD/ or TTbar/ directory, depending on input ROOT files.
 
-run.C makes histograms from ntuples resulting from cms-hcal-debug packages (analyze.root from previous file). This is currently set to do mode 1 (energy fraction vs. depth). Run this with:
+run.C makes histograms from ntuples resulting from cms-hcal-debug packages (analyze.root from previous file). This is currently set to do mode 1 (energy fraction vs. depth) and looks at the TP tree compareReemulRecoSeverity9/tps. Run this with:
 
     g++ -o run run.C  `root-config --cflags --glibs`
-    ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/ output_histograms.root 1
+    ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD/ output_histograms_QCD.root 1
+    
+    g++ -o run run.C  `root-config --cflags --glibs`
+    ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/TTbar/ output_histograms_TTbar.root 1
 
-This will output "output_histograms.root", which is needed for the plotting step.
+This will output "output_histograms_QCD.root" "output_histograms_TTbar.root", which is needed for the plotting step.
 
-Copy "output_histograms.root" and "analyze.root" to the /FilesToPlot directory. plot_simple.py creates two root files, "output_histograms.root" and "output_histograms2.root" in the same directory as the script, and puts plots in /outPlots_fraction (many files).
+plot_simple.py has the paths to QCD and TTbar directories, output files, and mode = 1 set. These are used as inputs to ./run again, and then plot_simple.py creates many plots in /outPlots_fraction. No input arguments are needed - just check that path1, path2, mode, out1, out2 are correct.
 
     cmsenv
-    python plot_simple.py /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/FilesToPlot/ compareReemulRecoSeverity9/tps 1
+    python plot_simple.py
+    
+Currently run.C and plot_simple.py are set up for analyzing TPs in the HCAL barrel and endcap region, with the Run 3 HCAL segmentation (up to 4 depth layers in HB, up to 7 in HE).
