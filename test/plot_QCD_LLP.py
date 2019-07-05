@@ -44,7 +44,7 @@ start = time.clock()
 #_constrain = [" && etsum > 0.5 && etsum <= 10"," && etsum > 10 && etsum <= 30"," && etsum > 30"]
 
 # this is directory where the output plots will be stored
-folder = "./outPlots_fraction/"
+folder = "./outPlots_fraction_QCD_LLP/"
 try:
   os.makedirs(folder)
 except OSError:
@@ -59,10 +59,10 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/TTbar/"
+path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh125_mx50_pl1000_ev2/"
 path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "TTbar/output_histograms_TTbar.root"
+out1 = "LLP_mh125_mx50_pl1000_ev2/output_histograms_LLP_mh125_mx50_pl1000_ev2.root"
 out2 = "QCD/output_histograms_QCD.root"
 
 # start defining functions
@@ -209,7 +209,7 @@ Energy_Depth_n = "Energy_Depth_HE"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
 
 Energy_Depth_t1_p.Draw("ehist")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TTbar")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, LLP")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 outpics = folder + output + "1.eps"
@@ -234,7 +234,7 @@ Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)                                                                  
-leg.AddEntry(Energy_Depth_t1_p,"TTbar MC")
+leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
 leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
 leg.Draw("same")
 c.SaveAs(outfile)
@@ -251,7 +251,7 @@ Energy_Depth_n = "Energy_Depth_HB"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
 
 Energy_Depth_t1_p.Draw("ehist")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TTbar")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, LLP")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 outpics = folder + output + "1.eps"
@@ -276,7 +276,7 @@ Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)
-leg.AddEntry(Energy_Depth_t1_p,"TTbar MC")
+leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
 leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
 leg.Draw("same")
 c.SaveAs(outfile)
