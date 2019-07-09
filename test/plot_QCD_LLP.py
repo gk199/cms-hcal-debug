@@ -59,11 +59,11 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh125_mx50_pl1000_ev2/"
-path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD/"
+path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh2000_mx975_pl10000_ev1000/"
+path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD_2bins_processed/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "LLP_mh125_mx50_pl1000_ev2/output_histograms_LLP_mh125_mx50_pl1000_ev2.root"
-out2 = "QCD/output_histograms_QCD.root"
+out1 = "LLP_mh2000_mx975_pl10000_ev1000/output_histograms_LLP_mh2000_mx975_pl10000_ev1000.root"
+out2 = "QCD_2bins_processed/output_histograms_QCD_2bins.root"
 
 # start defining functions
 def processData(path, out, mode):
@@ -199,7 +199,9 @@ def getHists3D(name, f):
   t_p.SetTitle("")
   return t_p
 
-# plots for the endcap region of fractional depth, inclusive
+# ********************************************************* 
+# plots for the ENDCAP region of fractional depth, inclusive
+# also adding in energy bins
 output = "TPFractionDepth_HE"
 outfile = folder + output + ".pdf"
 c = r.TCanvas()
@@ -207,7 +209,6 @@ c.SaveAs(outfile + '[')
 
 Energy_Depth_n = "Energy_Depth_HE"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
-
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, LLP")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
@@ -216,6 +217,7 @@ outpics = folder + output + "1.eps"
 c.SaveAs(outpics)
 c.SaveAs(outfile)
 c.Update()
+
 c = r.TCanvas()
 Energy_Depth_t2_p.Draw("ehist")
 Energy_Depth_t2_p.SetTitle("HCAL Endcap, Inclusive, QCD")
@@ -233,7 +235,7 @@ Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
-leg = r.TLegend(0.75,0.75,0.95,0.85)                                                                  
+leg = r.TLegend(0.75,0.75,0.95,0.85)             
 leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
 leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
 leg.Draw("same")
@@ -241,7 +243,46 @@ c.SaveAs(outfile)
 outpics = folder + output + "_com.eps"
 c.SaveAs(outpics)
 
-# plots for the barrel region of fractional depth, inclusive
+# adding for the inclusive regions, separated in energy bins
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_HE_0510"
+Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, ET 0.5-10 GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
+leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_lowET.eps"
+c.SaveAs(outpics)
+
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_HE_10"
+Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, ET 10+ GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
+leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_highET.eps"
+c.SaveAs(outpics)
+
+# *********************************************************
+# plots for the BARREL region of fractional depth, inclusive
+# also adding in splits for energy bins
 output = "TPFractionDepth_HB"
 outfile = folder + output + ".pdf"
 c = r.TCanvas()
@@ -249,7 +290,6 @@ c.SaveAs(outfile + '[')
 
 Energy_Depth_n = "Energy_Depth_HB"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
-
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, LLP")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
@@ -283,9 +323,47 @@ c.SaveAs(outfile)
 outpics = folder + output + "_com.eps"
 c.SaveAs(outpics)
 
+# adding for the inclusive regions, separated in energy bins                                                                          
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_HB_0510"
+Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, ET 0.5-10 GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
+leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_lowET.eps"
+c.SaveAs(outpics)
+
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_HB_10"
+Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, ET 10+ GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
+leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_highET.eps"
+c.SaveAs(outpics)
+
+# ********************************************************* 
 # plots for barrel and endcap regions, ieta and energy bins
 # ENDCAP
-for energy in range(1,4):
+for energy in range(1,3):
   print("Processing the energy range HE {}".format(energy))
   c = r.TCanvas()
   r.gStyle.SetPadBottomMargin(.12)
@@ -296,7 +374,7 @@ for energy in range(1,4):
   c.Update()
   c.Divide(4,3,0.01,0.01)
   num = 1
-  for eta in range(17,29):
+  for eta in range(17,29): # 17-28 are the endcap region
     c.cd(num)
     r.gPad.SetGridx(r.kTRUE)
     r.gPad.SetGridy(r.kTRUE)
@@ -332,8 +410,9 @@ tp_depth_eta_t2.Draw("colz")
 c.SaveAs(outfile)
 c.SaveAs(folder+tp_depth_eta_n+"_2.eps")
 
+# ********************************************************* 
 # BARREL
-for energy in range(1,4):
+for energy in range(1,3):
   print("Processing the energy range HB {}".format(energy))
   c = r.TCanvas()
   r.gStyle.SetPadBottomMargin(0.12)
@@ -344,11 +423,13 @@ for energy in range(1,4):
   c.Update()
   c.Divide(4,4,0.01,0.01)
   num = 1
-  for eta in range(1,17): # 1-16 are the barrel region
+  for eta in range(1,16): # 1-15 or 16 are the barrel region
+    #print("HB event with ieta {}".format(eta))
     c.cd(num)
     r.gPad.SetGridx(r.kTRUE)
     r.gPad.SetGridy(r.kTRUE)
     Energy_Depth_eta_en_HB = "Fraction_Depth_HB_Abs(eta){}_{}".format(eta,energy)
+    #print("eta, energy {}, {}".format(eta,energy))
     Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_eta_en_HB, f1, f2)
     Energy_Depth_t1_p.Draw("ehist")
     Energy_Depth_t1_p.SetTitle("iEta {}".format(eta))
@@ -363,7 +444,7 @@ for energy in range(1,4):
   c.SaveAs(outfile)
   c.SaveAs(folder+"Fraction_Depth_HB_{}.eps".format(energy))
 
-# Plotting energy in depth and ieta profile                                                                                                                                              
+# Plotting energy in depth and ieta profile                                                                                                   
 tp_depth_eta_n = "tp_depth_eta_HB"
 c = r.TCanvas()
 r.gPad.SetGridx(r.kTRUE)

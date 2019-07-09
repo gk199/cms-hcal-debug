@@ -344,7 +344,7 @@ for energy in range(1,4):
   c.Update()
   c.Divide(4,4,0.01,0.01)
   num = 1
-  for eta in range(1,17): # 1-16 are the barrel region
+  for eta in range(1,16): # 1-16 are the barrel region
     c.cd(num)
     r.gPad.SetGridx(r.kTRUE)
     r.gPad.SetGridy(r.kTRUE)
