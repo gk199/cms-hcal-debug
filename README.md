@@ -130,3 +130,8 @@ plot_simple.py has the paths to QCD and TTbar directories, output files, and mod
     python plot_simple.py
     
 Currently run.C and plot_simple.py are set up for analyzing TPs in the HCAL barrel and endcap region, with the Run 3 HCAL segmentation (up to 4 depth layers in HB, up to 7 in HE).
+
+#### run.C and plotting options
+run.C makes histograms from ntuples, and is set to split events into three transverse energy bins (0.5-10 GeV, 10-30 GeV, 30+ GeV). run_2bins.C is similar, but only makes 2 energy bins (0.5-10 GeV, 10+ GeV), and is often used for LLP samples.
+
+plot_QCD_LLP.py and plot_QCD_3LLP.py are set to run over ROOT files with the 2 energy bins. plot_QCD_3LLP.py makes overlayed inclusive plots resulting from 4 samples.
