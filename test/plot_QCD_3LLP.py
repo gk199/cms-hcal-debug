@@ -44,7 +44,7 @@ start = time.clock()
 #_constrain = [" && etsum > 0.5 && etsum <= 10"," && etsum > 10 && etsum <= 30"," && etsum > 30"]
 
 # this is directory where the output plots will be stored
-folder = "./outPlots_fraction_QCD_LLP/"
+folder = "./outPlots_fraction_QCD_LLP_overlay/"
 try:
   os.makedirs(folder)
 except OSError:
@@ -59,12 +59,15 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh2000_mx975_pl500_ev1000/"
-path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD_2bins_processed/"
+path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD_2bins_processed/"
+path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh2000_mx975_pl500_ev1000/"
+path3 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh2000_mx975_pl1000_ev1000/"
+path4 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh2000_mx975_pl10000_ev1000/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "LLP_mh2000_mx975_pl500_ev1000/output_histograms_LLP_mh2000_mx975_pl500_ev1000.root"
-out2 = "QCD_2bins_processed/output_histograms_QCD_2bins.root"
-
+out1 = "QCD_2bins_processed/output_histograms_QCD_2bins.root"
+out2 = "LLP_mh2000_mx975_pl500_ev1000/output_histograms_LLP_mh2000_mx975_pl500_ev1000.root"
+out3 = "LLP_mh2000_mx975_pl1000_ev1000/output_histograms_LLP_mh2000_mx975_pl1000_ev1000.root"
+out4 = "LLP_mh2000_mx975_pl10000_ev1000/output_histograms_LLP_mh2000_mx975_pl10000_ev1000.root"
 # start defining functions
 def processData(path, out, mode):
   print('./run '+path+' '+out+' '+str(mode))
@@ -131,6 +134,8 @@ if not process == 0:
       os.system("rm -rf ./1temp*.root")
     else:
       proc1 = multiprocessing.Process(target=processData, args=(path1,out1,mode))
+      proc3 = multiprocessing.Process(target=processData, args=(path3,out3,mode))
+      proc4 = multiprocessing.Process(target=processData, args=(path4,out4,mode))
       proc1.start()
       proc1.join()
       proc2.join()
@@ -138,10 +143,16 @@ if not process == 0:
 print("Plotting histograms...")
 f1 = r.TFile(out1)
 f2 = r.TFile(out2)
+f3 = r.TFile(out3)
+f4 = r.TFile(out4)
 if (f1.IsZombie() or (not f1.IsOpen())):
   print FAIL + "Error: cannot open " + out1 + " or the file is not valid,please check if filename is valid!" + END
 if (f2.IsZombie() or (not f2.IsOpen())):
   print FAIL + "Error: cannot open " + out2 + " or the file is not valid,please check if filename is valid!" + END
+if (f3.IsZombie() or (not f3.IsOpen())):
+  print FAIL + "Error: cannot open " + out3 + " or the file is not valid,please check if filename is valid!" + END
+if (f4.IsZombie() or (not f4.IsOpen())):
+  print FAIL + "Error: cannot open " + out4 + " or the file is not valid,please check if filename is valid!" + END
 
 r.gStyle.SetTitleFontSize(0.1)
 r.gStyle.SetTitleXSize(0.1)
@@ -151,31 +162,56 @@ r.gStyle.SetPadLeftMargin(.1)
 r.gStyle.SetPadRightMargin(.12)
 r.gStyle.SetPadTopMargin(.12)
 
-def getHists(name, f1, f2, ymax=1, title=0):
+def getHists(name, f1, f2, f3, f4, ymax=1, title=0):
   yMax = 0
   t1 = f1.Get(name)
   t2 = f2.Get(name)
+  t3 = f3.Get(name)
+  t4 = f4.Get(name)
   t1.Draw()
   t1_p = t1.ProfileX(name+"_1")
   t2_p = t2.ProfileX(name+"_2")
-  if t1_p.GetMaximum() > t2_p.GetMaximum():
+  t3_p = t3.ProfileX(name+"_3")
+  t4_p = t4.ProfileX(name+"_4")
+  if t1_p.GetMaximum() > t2_p.GetMaximum() and t1_p.GetMaximum() > t3_p.GetMaximum() and t1_p.GetMaximum() > t4_p.GetMaximum():
     yMax = t1_p.GetMaximum()
-  else:
+  elif t2_p.GetMaximum() > t3_p.GetMaximum() and t2_p.GetMaximum() > t4_p.GetMaximum():
     yMax = t2_p.GetMaximum()
+  elif t3_p.GetMaximum() > t4_p.GetMaximum():
+    yMax = t3_p.GetMaximum()
+  else:
+    yMax = t4_p.GetMaximum()
   if ymax:
-    yMax = 2
+    yMax = 4
   else:
     yMax = yMax * 1.2
-  t1_p.SetLineColor(1)
+  t1_p.SetLineColor(2)
   t1_p.SetLineWidth(2)
-  t1_p.SetMarkerColor(1)
+  t1_p.SetMarkerColor(2)
   t1_p.SetMarkerStyle(20)
   t1_p.SetAxisRange(0,min(yMax,1.05),"Y")
-  t2_p.SetLineColor(2)
+#  t2_p.SetLineColor(920)
+  t2_p.SetLineColor(1)
   t2_p.SetLineWidth(2)
-  t2_p.SetMarkerColor(2)
+#  t2_p.SetMarkerColor(920)
+  t2_p.SetMarkerColor(1)
   t2_p.SetMarkerStyle(20)
   t2_p.SetAxisRange(0,min(yMax,1.05),"Y")
+#  t3_p.SetLineColor(922)
+  t3_p.SetLineColor(3)
+  t3_p.SetLineWidth(2)
+#  t3_p.SetMarkerColor(922)
+  t3_p.SetMarkerColor(3)
+  t3_p.SetMarkerStyle(20)
+  t3_p.SetAxisRange(0,min(yMax,1.05),"Y")
+#  t4_p.SetLineColor(1)
+  t4_p.SetLineColor(4)
+  t4_p.SetLineWidth(2)
+#  t4_p.SetMarkerColor(1)
+  t4_p.SetMarkerColor(4)
+  t4_p.SetMarkerStyle(20)
+  t4_p.SetAxisRange(0,min(yMax,1.05),"Y")
+
   t1_p.SetTitle("")
   t2_p.SetTitle("")
   t1_p.SetTitleOffset(0.8,"x")
@@ -190,7 +226,7 @@ def getHists(name, f1, f2, ymax=1, title=0):
     t2_p.GetXaxis().SetLabelSize(0.06)
     t2_p.GetYaxis().SetLabelSize(0.06)
 
-  return t1_p, t2_p
+  return t1_p, t2_p, t3_p, t4_p
 
 def getHists3D(name, f):
   t = f.Get(name)
@@ -208,9 +244,9 @@ c = r.TCanvas()
 c.SaveAs(outfile + '[')
 
 Energy_Depth_n = "Energy_Depth_HE"
-Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, LLP")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, QCD")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 outpics = folder + output + "1.eps"
@@ -220,7 +256,7 @@ c.Update()
 
 c = r.TCanvas()
 Energy_Depth_t2_p.Draw("ehist")
-Energy_Depth_t2_p.SetTitle("HCAL Endcap, Inclusive, QCD")
+Energy_Depth_t2_p.SetTitle("HCAL Endcap, Inclusive, LLP ct=0.5 m")
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 outpics = folder + output + "2.eps"
@@ -230,14 +266,18 @@ c.SaveAs(outfile)
 c = r.TCanvas()
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
 Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)             
-leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com.eps"
@@ -246,17 +286,21 @@ c.SaveAs(outpics)
 # adding for the inclusive regions, separated in energy bins
 c = r.TCanvas()
 Energy_Depth_n = "Energy_Depth_HE_0510"
-Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
 Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, ET 0.5-10 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)
-leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com_lowET.eps"
@@ -264,17 +308,21 @@ c.SaveAs(outpics)
 
 c = r.TCanvas()
 Energy_Depth_n = "Energy_Depth_HE_10"
-Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
 Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, ET 10+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)
-leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com_highET.eps"
@@ -289,18 +337,19 @@ c = r.TCanvas()
 c.SaveAs(outfile + '[')
 
 Energy_Depth_n = "Energy_Depth_HB"
-Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, LLP")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, QCD")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 outpics = folder + output + "1.eps"
 c.SaveAs(outpics)
 c.SaveAs(outfile)
 c.Update()
+
 c = r.TCanvas()
 Energy_Depth_t2_p.Draw("ehist")
-Energy_Depth_t2_p.SetTitle("HCAL Barrel, Inclusive, QCD")
+Energy_Depth_t2_p.SetTitle("HCAL Barrel, Inclusive, LLP, ct=0.5 m")
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 outpics = folder + output + "2.eps"
@@ -310,14 +359,18 @@ c.SaveAs(outfile)
 c = r.TCanvas()
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
 Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)
-leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com.eps"
@@ -326,17 +379,21 @@ c.SaveAs(outpics)
 # adding for the inclusive regions, separated in energy bins                                                                          
 c = r.TCanvas()
 Energy_Depth_n = "Energy_Depth_HB_0510"
-Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
 Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, ET 0.5-10 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)
-leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com_lowET.eps"
@@ -344,122 +401,25 @@ c.SaveAs(outpics)
 
 c = r.TCanvas()
 Energy_Depth_n = "Energy_Depth_HB_10"
-Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
 Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, ET 10+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t2_p.GetYaxis().SetTitle("TP energy fraction");
 leg = r.TLegend(0.75,0.75,0.95,0.85)
-leg.AddEntry(Energy_Depth_t1_p,"LLP MC")
-leg.AddEntry(Energy_Depth_t2_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com_highET.eps"
 c.SaveAs(outpics)
-
-# ********************************************************* 
-# plots for barrel and endcap regions, ieta and energy bins
-# ENDCAP
-for energy in range(1,3):
-  print("Processing the energy range HE {}".format(energy))
-  c = r.TCanvas()
-  r.gStyle.SetPadBottomMargin(.12)
-  r.gStyle.SetPadLeftMargin(.13)
-  r.gStyle.SetPadRightMargin(.12)
-  r.gStyle.SetPadTopMargin(.12)
-  
-  c.Update()
-  c.Divide(4,3,0.01,0.01)
-  num = 1
-  for eta in range(17,29): # 17-28 are the endcap region
-    c.cd(num)
-    r.gPad.SetGridx(r.kTRUE)
-    r.gPad.SetGridy(r.kTRUE)
-    Energy_Depth_eta_en_HE = "Fraction_Depth_HE_Abs(eta){}_{}".format(eta,energy)
-    Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_eta_en_HE, f1, f2)
-    Energy_Depth_t1_p.Draw("ehist")
-    Energy_Depth_t1_p.SetTitle("iEta {}".format(eta))
-    Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
-    Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
-    Energy_Depth_t1_p.SetTitleSize(0.07,"xy")
-    Energy_Depth_t1_p.SetTitleOffset(0.8,"x")
-    Energy_Depth_t1_p.SetTitleOffset(0.85,"y")
-    Energy_Depth_t2_p.Draw("ehistsame")
-    num = num + 1
-  c.cd()
-  c.SaveAs(outfile)
-  c.SaveAs(folder+"Fraction_Depth_HE_{}.eps".format(energy))
-
-# Plotting energy in depth and ieta profile
-tp_depth_eta_n = "tp_depth_eta_HE"
-c = r.TCanvas()
-r.gPad.SetGridx(r.kTRUE)
-r.gPad.SetGridy(r.kTRUE)
-tp_depth_eta_t1 = getHists3D(tp_depth_eta_n, f1)
-tp_depth_eta_t1.Draw("colz")
-c.SaveAs(outfile)
-c.SaveAs(folder+tp_depth_eta_n+"_1.eps")
-c = r.TCanvas()
-r.gPad.SetGridx(r.kTRUE)
-r.gPad.SetGridy(r.kTRUE)
-tp_depth_eta_t2 = getHists3D(tp_depth_eta_n, f2)
-tp_depth_eta_t2.Draw("colz")
-c.SaveAs(outfile)
-c.SaveAs(folder+tp_depth_eta_n+"_2.eps")
-
-# ********************************************************* 
-# BARREL
-for energy in range(1,3):
-  print("Processing the energy range HB {}".format(energy))
-  c = r.TCanvas()
-  r.gStyle.SetPadBottomMargin(0.12)
-  r.gStyle.SetPadLeftMargin(0.14) 
-  r.gStyle.SetPadRightMargin(0.12)
-  r.gStyle.SetPadTopMargin(0.12)
-
-  c.Update()
-  c.Divide(4,4,0.01,0.01)
-  num = 1
-  for eta in range(1,16): # 1-15 or 16 are the barrel region
-    #print("HB event with ieta {}".format(eta))
-    c.cd(num)
-    r.gPad.SetGridx(r.kTRUE)
-    r.gPad.SetGridy(r.kTRUE)
-    Energy_Depth_eta_en_HB = "Fraction_Depth_HB_Abs(eta){}_{}".format(eta,energy)
-    #print("eta, energy {}, {}".format(eta,energy))
-    Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_eta_en_HB, f1, f2)
-    Energy_Depth_t1_p.Draw("ehist")
-    Energy_Depth_t1_p.SetTitle("iEta {}".format(eta))
-    Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
-    Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
-    Energy_Depth_t1_p.SetTitleSize(0.09,"xy")
-    Energy_Depth_t1_p.SetTitleOffset(0.6,"x")
-    Energy_Depth_t1_p.SetTitleOffset(0.65,"y")
-    Energy_Depth_t2_p.Draw("ehistsame")
-    num = num + 1
-  c.cd()
-  c.SaveAs(outfile)
-  c.SaveAs(folder+"Fraction_Depth_HB_{}.eps".format(energy))
-
-# Plotting energy in depth and ieta profile                                                                                                   
-tp_depth_eta_n = "tp_depth_eta_HB"
-c = r.TCanvas()
-r.gPad.SetGridx(r.kTRUE)
-r.gPad.SetGridy(r.kTRUE)
-tp_depth_eta_t1 = getHists3D(tp_depth_eta_n, f1)
-tp_depth_eta_t1.Draw("colz")
-c.SaveAs(outfile)
-c.SaveAs(folder+tp_depth_eta_n+"_1.eps")
-c = r.TCanvas()
-r.gPad.SetGridx(r.kTRUE)
-r.gPad.SetGridy(r.kTRUE)
-tp_depth_eta_t2 = getHists3D(tp_depth_eta_n, f2)
-tp_depth_eta_t2.Draw("colz")
-c.SaveAs(outfile)
-c.SaveAs(folder+tp_depth_eta_n+"_2.eps")
 
 
 c.SaveAs(outfile + ']')
