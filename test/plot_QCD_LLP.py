@@ -59,10 +59,10 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh2000_mx975_pl500_ev1000/"
+path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh125_mx50_pl10000_ev1000/"
 path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD_2bins_processed/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "LLP_mh2000_mx975_pl500_ev1000/output_histograms_LLP_mh2000_mx975_pl500_ev1000.root"
+out1 = "LLP_mh125_mx50_pl10000_ev1000/output_histograms_LLP_mh125_mx50_pl10000_ev1000.root"
 out2 = "QCD_2bins_processed/output_histograms_QCD_2bins.root"
 
 # start defining functions
@@ -249,7 +249,7 @@ Energy_Depth_n = "Energy_Depth_HE_0510"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, ET 0.5-10 GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 0.5-10 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -267,7 +267,7 @@ Energy_Depth_n = "Energy_Depth_HE_10"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, ET 10+ GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 10+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -329,7 +329,7 @@ Energy_Depth_n = "Energy_Depth_HB_0510"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, ET 0.5-10 GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 0.5-10 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -347,7 +347,7 @@ Energy_Depth_n = "Energy_Depth_HB_10"
 Energy_Depth_t1_p, Energy_Depth_t2_p = getHists(Energy_Depth_n, f1, f2, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, ET 10+ GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 10+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
