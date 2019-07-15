@@ -69,9 +69,9 @@ out3 = "LLP_mh125_mx50_pl10000_ev1000/output_histograms_LLP_mh125_mx50_pl10000_e
 
 # start defining functions
 def processData(path, out, mode):
-  print('./run '+path+' '+out+' '+str(mode))
-  # this is running the ./run executable that results from the run.C file
-  status = os.system('./run '+path+' '+out+' '+str(mode))
+  print('./run_2bins '+path+' '+out+' '+str(mode))
+  # this is running the ./run_2bins executable that results from the run.C file
+  status = os.system('./run_2bins '+path+' '+out+' '+str(mode))
   print(path+" finished")
   return status
 
@@ -100,7 +100,7 @@ if not process == 0:
     for group in _ngroup:
       _outf = "1temp{}.root".format(_num)
       _out.append(_outf)
-      print("./run {} {} {}".format(group, _outf, mode))
+      print("./run_2bins {} {} {}".format(group, _outf, mode))
       thread = threading.Thread(target=processData, args=(group,_outf,mode))
       thread.start()
       _record.append(thread)
