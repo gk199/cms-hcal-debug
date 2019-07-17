@@ -59,11 +59,11 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh125_mx50_pl10000_ev1000/"
-path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD_2bins_processed/"
+path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh2000_mx975_pl500_ev1000/"
+path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD_2bins/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "LLP_mh125_mx50_pl10000_ev1000/output_histograms_LLP_mh125_mx50_pl10000_ev1000.root"
-out2 = "QCD_2bins_processed/output_histograms_QCD_2bins.root"
+out1 = "LLP_mh2000_mx975_pl500_ev1000/output_histograms_LLP_mh2000_mx975_pl500_ev1000.root"
+out2 = "QCD_2bins/output_histograms_QCD_2bins.root"
 
 # start defining functions
 def processData(path, out, mode):
