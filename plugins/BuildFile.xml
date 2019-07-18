@@ -17,6 +17,10 @@
 <use name="Geometry/Records"/>
 <use name="PhysicsTools/Utilities"/>
 <use name="RecoLocalCalo/HcalRecAlgos"/>
+<use name="SimDataFormats/GeneratorProducts"/>
+<use name="DataFormats/HepMCCandidate"/>
+<use name="DataFormats/Math"/>
+
 <use name="Debug/HcalDebug"/>
 <use name="boost"/>
 <flags EDM_PLUGIN="1"/>

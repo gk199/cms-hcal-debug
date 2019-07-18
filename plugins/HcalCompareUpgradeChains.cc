@@ -17,7 +17,7 @@
 // $Id$
 //
 // Updates by: georgia karapostoli [2019]
-// Updated by: gillian kopp [2019] for TP studies with depth and timing information
+// Updated by: gillian kopp [2019] for TP studies with depth and timing information, and adding Gen Matching capabilities
 
 // system include files
 #include <memory>
@@ -60,6 +60,22 @@
 #include "DataFormats/HcalRecHit/interface/HBHERecHit.h"
 #include "DataFormats/HcalRecHit/interface/HFRecHit.h"
 #include "DataFormats/L1CaloTrigger/interface/L1CaloCollections.h"
+// GEN info 
+#include "SimDataFormats/PileupSummaryInfo/interface/PileupSummaryInfo.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHEEventProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/LHERunInfoProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+#include "DataFormats/PatCandidates/interface/Electron.h"
+#include "DataFormats/PatCandidates/interface/Jet.h"
+#include "DataFormats/PatCandidates/interface/Photon.h"
+#include "DataFormats/PatCandidates/interface/MET.h"
+#include "DataFormats/PatCandidates/interface/Tau.h"
+#include "DataFormats/PatCandidates/interface/PackedTriggerPrescales.h"
+#include "DataFormats/PatCandidates/interface/GenericParticle.h"
+#include "DataFormats/PatCandidates/interface/PackedGenParticle.h"
+#include "DataFormats/Common/interface/ValueMap.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
 
 #include "Geometry/CaloGeometry/interface/CaloGeometry.h"
 #include "Geometry/HcalTowerAlgo/interface/HcalGeometry.h"
@@ -72,11 +88,20 @@
 #include "RecoLocalCalo/HcalRecAlgos/interface/HcalSeverityLevelComputer.h"
 #include "RecoLocalCalo/HcalRecAlgos/interface/HcalSeverityLevelComputerRcd.h"
 
+#include "DataFormats/Math/interface/deltaR.h"
+
 #include "TH1D.h"
 #include "TH2D.h"
 #include "TString.h"
 #include "TTree.h"
-//
+#include "TLorentzVector.h"
+#include "TRandom3.h"
+#include "Math/LorentzVector.h" 
+#include <Math/VectorUtil.h>
+
+#include <algorithm>
+
+typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
 // class declaration
 //
 
@@ -87,6 +112,14 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
 
       static void fillDescriptions(edm::ConfigurationDescriptions& descriptions);
 
+  const reco::Candidate* findFirstMotherWithDifferentID(const reco::Candidate *particle);
+
+  struct ptsort: public std::binary_function<LorentzVector, LorentzVector, bool> 
+  {
+    bool operator () (const LorentzVector & x, const LorentzVector & y) 
+    { return  ( x.pt() > y.pt() ) ; }
+  };
+
    private:
       virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void beginLuminosityBlock(const edm::LuminosityBlock&, const edm::EventSetup&) override;
@@ -96,9 +129,10 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       // ----------member data ---------------------------
       bool first_;
 
-      std::vector<edm::InputTag> frames_;
-      edm::InputTag digis_;
-  //      edm::InputTag rechits_;
+  edm::EDGetTokenT<edm::View<reco::GenParticle> > GenTag_;
+
+  std::vector<edm::InputTag> frames_;
+  edm::InputTag digis_;
   std::vector<edm::InputTag> rechits_;
 
   edm::ESHandle<CaloGeometry> gen_geo_; 
@@ -108,9 +142,12 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       TH2D *tp_multiplicity_;
 
       TTree *tps_;
+  TTree *tpsmatch_;
       TTree *tpsplit_;
       TTree *events_;
       TTree *matches_;
+
+  double gen_b_pt_[4], gen_b_eta_[4], gen_b_phi_[4];
 
       double tp_energy_;
       int tp_ieta_;
@@ -137,7 +174,6 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       double ev_tp_energy_;
       int ev_rh_unmatched_;
       int ev_tp_unmatched_;
-  //      int ev_nvtx_;
 
       double mt_rh_energy0_;
       double mt_rh_energy_;
@@ -165,6 +201,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
 HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& config) :
    edm::EDAnalyzer(),
    first_(true),
+   GenTag_( consumes<edm::View<reco::GenParticle> >(config.getParameter<edm::InputTag>("GenParticleTag")) ),
    frames_(config.getParameter<std::vector<edm::InputTag>>("dataFrames")),
    digis_(config.getParameter<edm::InputTag>("triggerPrimitives")),
    rechits_(config.getParameter<std::vector<edm::InputTag>>("recHits")),
@@ -197,6 +234,22 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tps_->Branch("depth_end", &tp_depth_end_);
    tps_->Branch("soi", &tp_soi_);
    tps_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
+
+   // these are the gen particle branches in the tps tree, and are filled in order of b quark pt
+   tps_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D"); 
+   tps_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D"); 
+   tps_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
+
+   tpsmatch_ = fs->make<TTree>("tps_match", "Trigger primitives matched to GEN particles");
+   tpsmatch_->Branch("et", &tp_energy_);
+   tpsmatch_->Branch("ieta", &tp_ieta_);
+   tpsmatch_->Branch("iphi", &tp_iphi_);
+   tpsmatch_->Branch("soi", &tp_soi_);
+   tpsmatch_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
+
+   tpsmatch_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
+   tpsmatch_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
+   tpsmatch_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
 
    tpsplit_ = fs->make<TTree>("tpsplit", "Trigger primitives");
    tpsplit_->Branch("et", &tpsplit_energy_);
@@ -351,6 +404,59 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
     }
   }
    */
+
+
+   //gen particles
+   Handle<edm::View<reco::GenParticle> > genParticles;
+   event.getByToken(GenTag_, genParticles);
+
+   std::vector<LorentzVector > genbs;
+
+   int num_b = 0;
+   int index = 0;
+   // loop over the gen particles
+   for(auto & it: *genParticles){
+     index ++;
+     // require hard process - this is what LLP will come from 
+     if(!it.isHardProcess()) continue;
+
+     //     const reco::Candidate* mom = findFirstMotherWithDifferentID(&it);
+     /*
+    if (mom){
+      momId = mom->pdgId();
+    }
+     
+
+     int pdgId = abs(it.pdgId());
+     int status = it.status();
+     //    float px = it.px();
+     //    float py = it.py();
+     //    float pz = it.pz();
+     float pt = it.pt();
+     float eta = it.eta();
+     float phi = it.phi();
+     float mass = it.mass();
+     */
+     int pdgId = abs(it.pdgId());      
+
+     LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
+
+     if( abs(pdgId)==5 ){ // b quarks - make (good) assumption that any b quark is from the LLP
+       genbs.push_back(p4); 
+       num_b ++;
+     } 
+   }
+
+   sort(genbs.begin(), genbs.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
+
+   // Fill the GEN branches in tps tree
+   for(int i=0;i<4;i++){
+     gen_b_pt_[i]=genbs[i].pt(); 
+     gen_b_eta_[i]=genbs[i].eta();
+     gen_b_phi_[i]=genbs[i].phi();
+   }
+
+
    //   edm::ESHandle<CaloGeometry> gen_geo;
    setup.get<CaloGeometryRecord>().get(gen_geo_);
 
@@ -458,6 +564,32 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       tp_soi_ = digi.SOI_compressedEt();
       tps_->Fill();
 
+      /*
+      HcalDetId hcaldetid(id);
+
+      auto thisCell = gen_geo_->getGeometry(id);
+
+      // Convert TP detector ieta,iphi to physical eta,phi coordinates
+      double tp_eta_=thisCell->etaPos();
+      double tp_phi_=thisCell->phiPos();
+
+      printf("TP detector ieta= %d , iphi= %d and physical eta= %lf, phi= %lf\n",tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
+      */
+
+      // Fill the reduced tps_ tree: tpsmatch_
+      //      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
+      float dRmin(999.);
+
+      for (auto & it : genbs) {
+	double dR = 1.; 
+	  //deltaR(it, isv);
+	if (dR<dRmin) dRmin=dR;
+      }
+
+      // Only keep the TP if each associated to a b-quark from the LLP
+      if(dRmin<0.5) {  tpsmatch_->Fill(); }
+
+
       if (et_sum > 0) {
 	  for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
             int depth = energy_depth[i];
@@ -550,6 +682,24 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
    
    events_->Fill();
 }
+
+
+
+const reco::Candidate* HcalCompareUpgradeChains::findFirstMotherWithDifferentID(const reco::Candidate *particle){
+  if( particle == 0 ) {
+    printf("ERROR! null candidate pointer, this should never happen\n");
+    return 0;
+  }
+  else if (particle->numberOfMothers() > 0 && particle->pdgId() != 0) {
+    if (particle->pdgId() == particle->mother(0)->pdgId()) {
+      return findFirstMotherWithDifferentID(particle->mother(0));
+    }else{
+      return particle->mother(0);
+    }
+  }
+  return 0;
+}
+
 
 void
 HcalCompareUpgradeChains::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {

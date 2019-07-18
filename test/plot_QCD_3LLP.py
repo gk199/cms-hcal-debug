@@ -59,15 +59,15 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD_2bins/"
-path2 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh125_mx50_pl500_ev1000/"
-path3 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh125_mx50_pl1000_ev1000/"
-path4 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/LLP_mh125_mx50_pl10000_ev1000/"
+path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins/"
+path2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl500_ev1000/"
+path3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl1000_ev1000/"
+path4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl10000_ev1000/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "QCD_2bins/output_histograms_QCD_2bins.root"
-out2 = "LLP_mh125_mx50_pl500_ev1000/output_histograms_LLP_mh125_mx50_pl500_ev1000.root"
-out3 = "LLP_mh125_mx50_pl1000_ev1000/output_histograms_LLP_mh125_mx50_pl1000_ev1000.root"
-out4 = "LLP_mh125_mx50_pl10000_ev1000/output_histograms_LLP_mh125_mx50_pl10000_ev1000.root"
+out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins/output_histograms_QCD_2bins.root"
+out2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl500_ev1000/output_histograms_LLP_mh125_mx50_pl500_ev1000.root"
+out3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl1000_ev1000/output_histograms_LLP_mh125_mx50_pl1000_ev1000.root"
+out4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl10000_ev1000/output_histograms_LLP_mh125_mx50_pl10000_ev1000.root"
 # start defining functions
 def processData(path, out, mode):
   print('./run_2bins '+path+' '+out+' '+str(mode))

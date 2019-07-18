@@ -109,6 +109,7 @@ def compare_tp_reco(process, name, tag_tp, tag_df, sev):
     add_path(process)
     setattr(process, name, cms.EDAnalyzer("HcalCompareUpgradeChains",
                                           triggerPrimitives=cms.InputTag(tag_tp),
+                                          GenParticleTag = cms.InputTag("genParticles"),
                                           recHits=cms.VInputTag('hbheprereco', 'hfreco'),
                                           dataFrames=cms.VInputTag(cms.InputTag(tag_df), cms.InputTag(tag_df)),
                                           swapIphi=cms.bool(False),
