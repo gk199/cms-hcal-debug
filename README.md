@@ -104,7 +104,7 @@ There exist now upgradeTPs-104X, upgradeTPs-106X branches rebased in 104X, 106X 
 ### Specifics for energy-depth information workflow
 Workflow (Gillian Kopp, June 2019):
 
-Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit plugins/HcalCompareUpgradeChains.cc (for energy-depth, added "tp_energy_depth_[8]" to tps branch) and analyze_run3.py (list the MC ROOT files to use - currently set up with QCD and TTbar Run 3 MC files). Compile and run with:
+Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit plugins/HcalCompareUpgradeChains.cc (for energy-depth, added "tp_energy_depth_[8]" to tps branch) and analyze_run3.py (list the MC ROOT files to use - currently set up with QCD and LLP Run 3 MC files). Compile and run with:
     
     scram b -j 4
     cd test
@@ -112,26 +112,29 @@ Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDeb
     source runcrab3.sh
     cmsRun analyze_run3.py
 
-This will output "analyze.root" with TP (tps branch). Move to QCD/ or TTbar/ directory, depending on input ROOT files.
+This will output "analyze.root" with TP (tps branch, and tps_match with Gen matching information for QCD and LLP). Move to QCD/ or LLP/ directory on EOS (/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles), depending on input ROOT files.
 
-run.C makes histograms from ntuples resulting from cms-hcal-debug packages (analyze.root from previous file). This is currently set to do mode 1 (energy fraction vs. depth) and looks at the TP tree compareReemulRecoSeverity9/tps. Run this with:
+run.C makes histograms from ntuples resulting from cms-hcal-debug packages (analyze.root from previous file). This is currently set to do mode 1 (energy fraction vs. depth) and looks at the TP tree compareReemulRecoSeverity9/tps. run_2bins.C looks at the TP tree compareReemulRecoSeverity9/tps_match with Gen Matching between TPs and MC samples. run_2bins.C splits into 0.5-10 GeV and 10+ GeV, and is used for LLP analysis. Run this with:
 
-    g++ -o run run.C  `root-config --cflags --glibs`
-    ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/QCD/ output_histograms_QCD.root 1
+    g++ -o run_2bins run_2bins.C  `root-config --cflags --glibs`
+    ./run_2bins /eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins/ /eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins/output_histograms_QCD_2bins.root 1
     
-    g++ -o run run.C  `root-config --cflags --glibs`
-    ./run /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/TTbar/ output_histograms_TTbar.root 1
+    g++ -o run_2bins run_2bins.C  `root-config --cflags --glibs`
+    ./run_2bins /eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl500_ev1000/ /eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_mh125_mx50_pl500_ev1000/output_histograms_mh125_mx50_pl500_ev1000.root 1
 
-This will output "output_histograms_QCD.root" "output_histograms_TTbar.root", which is needed for the plotting step.
-
-plot_simple.py has the paths to QCD and TTbar directories, output files, and mode = 1 set. These are used as inputs to ./run again, and then plot_simple.py creates many plots in /outPlots_fraction. No input arguments are needed - just check that path1, path2, mode, out1, out2 are correct.
-
-    cmsenv
-    python plot_simple.py
-    
-Currently run.C and plot_simple.py are set up for analyzing TPs in the HCAL barrel and endcap region, with the Run 3 HCAL segmentation (up to 4 depth layers in HB, up to 7 in HE).
+This will output "output_histograms_QCD.root" "output_histograms_LLP.root", which is needed for the plotting step.
 
 #### run.C and plotting options
 run.C makes histograms from ntuples, and is set to split events into three transverse energy bins (0.5-10 GeV, 10-30 GeV, 30+ GeV). run_2bins.C is similar, but only makes 2 energy bins (0.5-10 GeV, 10+ GeV), and is often used for LLP samples.
 
-plot_QCD_LLP.py and plot_QCD_3LLP.py are set to run over ROOT files with the 2 energy bins. plot_QCD_3LLP.py makes overlayed inclusive plots resulting from 4 samples.
+plot_simple.py has the paths to QCD and TTbar directories, output files, and mode = 1 set. These are used as inputs to ./run again, and then plot_simple.py creates many plots in /outPlots_fraction. No input arguments are needed - just check that path1, path2, mode, out1, out2 are correct.
+
+plot_QCD_LLP.py, plot_QCD_2LLP.py, and plot_QCD_3LLP.py are set to run over ROOT files with the 2 energy bins. plot_QCD_2LLP.py and plot_QCD_3LLP.py make overlayed inclusive plots resulting from 2 or 3 LLP samples. This is useful for plotting mass and lifetime comparisons, respectively.
+
+    cmsenv
+    python plot_simple.py
+    
+    cmsenv
+    python plot_QCD_LLP.py
+    
+Currently run.C and plot_simple.py are set up for analyzing TPs in the HCAL barrel and endcap region, with the Run 3 HCAL segmentation (up to 4 depth layers in HB, up to 7 in HE).
