@@ -114,6 +114,11 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
 
   const reco::Candidate* findFirstMotherWithDifferentID(const reco::Candidate *particle);
 
+  double deltaPhi(double phi1, double phi2);
+  double deltaR(double eta1, double phi1, double eta2, double phi2);
+
+  double etaVal(int ieta); double phiVal(int iphi);
+
   struct ptsort: public std::binary_function<LorentzVector, LorentzVector, bool> 
   {
     bool operator () (const LorentzVector & x, const LorentzVector & y) 
@@ -410,9 +415,10 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
    Handle<edm::View<reco::GenParticle> > genParticles;
    event.getByToken(GenTag_, genParticles);
 
-   std::vector<LorentzVector > genbs;
+   //   std::vector<LorentzVector > genbs; // b-quarks from LLP sample
+   std::vector<LorentzVector > partons; // quarks of gluon in QCD sample --> more inclusive set of hadrons also containing LLP products
 
-   int num_b = 0;
+   //   int num_b = 0;
    int index = 0;
    // loop over the gen particles
    for(auto & it: *genParticles){
@@ -426,7 +432,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       momId = mom->pdgId();
     }
      
-
      int pdgId = abs(it.pdgId());
      int status = it.status();
      //    float px = it.px();
@@ -441,19 +446,25 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
 
+     if ( (abs(pdgId)>=1 && abs(pdgId)<=5) || abs(pdgId)==21) {
+       partons.push_back(p4);
+     }
+     /*
      if( abs(pdgId)==5 ){ // b quarks - make (good) assumption that any b quark is from the LLP
        genbs.push_back(p4); 
        num_b ++;
      } 
+     */
+
    }
 
-   sort(genbs.begin(), genbs.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
+   sort(partons.begin(), partons.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
 
    // Fill the GEN branches in tps tree
    for(int i=0;i<4;i++){
-     gen_b_pt_[i]=genbs[i].pt(); 
-     gen_b_eta_[i]=genbs[i].eta();
-     gen_b_phi_[i]=genbs[i].phi();
+     gen_b_pt_[i]=partons[i].pt(); 
+     gen_b_eta_[i]=partons[i].eta();
+     gen_b_phi_[i]=partons[i].phi();
    }
 
 
@@ -564,25 +575,29 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       tp_soi_ = digi.SOI_compressedEt();
       tps_->Fill();
 
-      /*
-      HcalDetId hcaldetid(id);
+      
+      //      HcalDetId hcaldetid(id);
 
-      auto thisCell = gen_geo_->getGeometry(id);
+      //      auto thisCell = gen_geo_->getGeometry(id);
 
       // Convert TP detector ieta,iphi to physical eta,phi coordinates
-      double tp_eta_=thisCell->etaPos();
-      double tp_phi_=thisCell->phiPos();
+      double tp_eta_=etaVal(tp_ieta_); //(double)thisCell->etaPos();
+      double tp_phi_=phiVal(tp_iphi_); // (double)thisCell->phiPos();
 
-      printf("TP detector ieta= %d , iphi= %d and physical eta= %lf, phi= %lf\n",tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
-      */
+      //      printf("TP detector ieta= %d , iphi= %d and physical eta= %f, phi= %f\n",tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
+      //      printf("TP detector ieta= %d , iphi= %d \n",tp_ieta_,tp_iphi_);
+      //      printf("physical eta= %f, phi= %f\n",tp_eta_,tp_phi_);
 
       // Fill the reduced tps_ tree: tpsmatch_
-      //      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
       float dRmin(999.);
 
-      for (auto & it : genbs) {
-	double dR = 1.; 
-	  //deltaR(it, isv);
+      for (auto & it : partons) {
+
+	// discard b-quarks outside the detector acceptance
+	if(it.pt()<20.)continue;
+	if(fabs(it.eta())>2.5) continue;
+
+	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi()); 
 	if (dR<dRmin) dRmin=dR;
       }
 
@@ -700,6 +715,52 @@ const reco::Candidate* HcalCompareUpgradeChains::findFirstMotherWithDifferentID(
   return 0;
 }
 
+double HcalCompareUpgradeChains::deltaPhi(double phi1, double phi2) {
+
+  if (phi1<0) phi1+=2.*TMath::Pi();
+  if (phi2<0) phi2+=2.*TMath::Pi();
+
+  double result = phi1 - phi2;
+  if(fabs(result) > 9999) return result;
+  while (result > TMath::Pi()) result -= 2*TMath::Pi();
+  while (result <= -TMath::Pi()) result += 2*TMath::Pi();
+  return result;
+}
+
+double HcalCompareUpgradeChains::deltaR(double eta1, double phi1, double eta2, double phi2) {
+  double deta = eta1 - eta2;
+  double dphi = deltaPhi(phi1, phi2);
+  return sqrt(deta*deta + dphi*dphi);
+}
+
+
+double HcalCompareUpgradeChains::etaVal(int ieta) {
+
+  double ietaBins=58.;
+  double ietaBinsHF=3.;
+
+  double etavl;
+
+  if (abs(ieta)>=29) { // HF 
+    etavl=(double)ieta*(0.2/ietaBinsHF);
+  } else { // HBHE
+    etavl=(double)ieta*(0.6/ietaBins);
+  }
+
+  return etavl;
+
+}
+
+double HcalCompareUpgradeChains::phiVal(int iphi) {
+
+  double phiBins=72.;
+
+  double phivl;
+  phivl=double(iphi)*(2.*TMath::Pi()/phiBins);
+
+  return phivl;
+
+}
 
 void
 HcalCompareUpgradeChains::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {

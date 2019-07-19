@@ -23,6 +23,7 @@
 // Edited by: gillian kopp [2019] for TP studies with depth and timing information
 // workflow: HcalCompareUpgradeChains.cc and analyze_run3.py, outputs analyze.root. run.C, outputs output_histograms.root, move to FilesToPlot. Then run plot.py
 // This version is only for ''mode 1'' meaning energy fraction vs. depth information
+// tps is TPs without gen matching, tps_matches is TPs with gen matching (for both QCD and LLP hard scattering processes)
 
 int main(int argc, char* argv[])
 {
@@ -41,8 +42,9 @@ int main(int argc, char* argv[])
   std::string treeList = "";
 
   // which tree to look at from the input file, here only looking at Trigger Primatives (TPs)
-  treeList = "compareReemulRecoSeverity9/tps";
-  
+  //treeList = "compareReemulRecoSeverity9/tps";
+  treeList = "compareReemulRecoSeverity9/tps_match";
+
   TString dir = TString(inputList.c_str());
   TFile *outFile = new TFile(_outFile.c_str(), "RECREATE");
   TChain *tchain = new TChain(treeList.c_str());
