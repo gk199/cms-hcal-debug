@@ -147,12 +147,12 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       TH2D *tp_multiplicity_;
 
       TTree *tps_;
-  TTree *tpsmatch_;
+      TTree *tpsmatch_;
       TTree *tpsplit_;
       TTree *events_;
       TTree *matches_;
 
-  double gen_b_pt_[4], gen_b_eta_[4], gen_b_phi_[4];
+      double gen_b_pt_[4], gen_b_eta_[4], gen_b_phi_[4];
 
       double tp_energy_;
       int tp_ieta_;
@@ -460,7 +460,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
    sort(partons.begin(), partons.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
 
-   // Fill the GEN branches in tps tree
+   // Fill the GEN branches in tps tree and tpsmatch
    for(int i=0;i<4;i++){
      gen_b_pt_[i]=partons[i].pt(); 
      gen_b_eta_[i]=partons[i].eta();
