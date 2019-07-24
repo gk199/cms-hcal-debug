@@ -152,6 +152,8 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       TTree *events_;
       TTree *matches_;
 
+      int event_;
+
       double gen_b_pt_[4], gen_b_eta_[4], gen_b_phi_[4];
 
       double tp_energy_;
@@ -162,6 +164,8 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       int tp_depth_end_;
       double tp_energy_depth_[8] = {0.0};
       int tp_soi_;
+  // int tp_pulse_shape_[8] = {};
+  int tp_ts_adc_[8] = {0};          
 
       double tpsplit_energy_;  
       double tpsplit_oot_;
@@ -239,6 +243,9 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tps_->Branch("depth_end", &tp_depth_end_);
    tps_->Branch("soi", &tp_soi_);
    tps_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
+   tps_->Branch("tp_ts_adc", &tp_ts_adc_, "tp_ts_adc[8]/I");    
+   //   tps_->Branch("TP_pulse_shape", tp_pulse_shape_, "TP_pulse_shape[8]/I");
+   tps_->Branch("event", &event_);
 
    // these are the gen particle branches in the tps tree, and are filled in order of b quark pt
    tps_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D"); 
@@ -251,7 +258,9 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch_->Branch("iphi", &tp_iphi_);
    tpsmatch_->Branch("soi", &tp_soi_);
    tpsmatch_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
+   tpsmatch_->Branch("event", &event_);
 
+   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt   
    tpsmatch_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
    tpsmatch_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
    tpsmatch_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
@@ -314,6 +323,8 @@ void
 HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup& setup)
 {
    using namespace edm;
+
+   event_ = event.id().event();
 
    edm::ESHandle<HcalTrigTowerGeometry> tpd_geo_h;
    setup.get<CaloGeometryRecord>().get(tpd_geo_h);
@@ -545,11 +556,14 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       tp_depth_end_ = -1;
       tp_depth_max_ = -1;
       memset(tp_energy_depth_, 0, sizeof(tp_energy_depth_));
+      memset(tp_ts_adc_, 0, sizeof(tp_ts_adc_));                 
+      //      memset(tp_pulse_shape_, 0, sizeof(tp_pulse_shape_));
       int et_max = 0;
       int et_sum = 0;
 
       //      if(tp_energy_<=0.5) continue; 
 
+      // getting the energy depth information filled
       std::vector<int> energy_depth = digi.getDepthData();
       for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
          int depth = energy_depth[i];
@@ -565,6 +579,20 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
             }
          }
       }
+
+      // getting the pulse shape information filled
+      std::vector<int> ts_adc = digi.getSampleData();        
+      //      std::vector<int> pulse_shape = digi.getSampleData();
+      for (int i = 0; i < static_cast<int>(ts_adc.size()); i++) {          
+	tp_ts_adc_[i] = ts_adc[i];           
+      }
+
+      /*
+      for (int i = 0; i < static_cast<int>(pulse_shape.size()); ++i) {
+	//int shape = pulse_shape[i];
+	tp_pulse_shape_[i] += pulse_shape[i];
+      }
+      */
       double sum = 0;
       std::for_each(tp_energy_depth_, tp_energy_depth_ + 8, [&](double &i){ sum += i; });
       std::for_each(tp_energy_depth_, tp_energy_depth_ + 8, [=](double &i){ 
