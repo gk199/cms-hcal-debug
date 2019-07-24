@@ -64,10 +64,6 @@ int main(int argc, char* argv[])
   int     _depthHE[] ={0,1,2,3,4,5,6,7};
   int     _length_depthHE = (sizeof(_depthHE)/sizeof(*_depthHE));
 
-  // setting up definitions for pulse shape studies
-  int     _pulseshape[] = {0,1,2,3};
-  int     _length_pulseshape = (sizeof(_pulseshape)/sizeof(*_pulseshape));
-
   // defining variables that are extracted from the analyze.root tps tree
   double  et = 0;
   int     ieta = 0;
@@ -120,6 +116,8 @@ int main(int argc, char* argv[])
 
   // going through each entry of the input ntuples file
   long int nentries = tchain->GetEntries();
+  std::cout << "energy: " << et << " ieta: " << ieta << std::endl;
+
   std::cout << "The number of entries is: " << nentries << std::endl;
 
   for (long int i = 0;i<nentries;i++)
@@ -135,12 +133,16 @@ int main(int argc, char* argv[])
     
     if (soi >= 255 ) continue;
     if (abs(ieta) >= 29 ) continue; // these are events in the HCAL Forward region
-    //    std::cout << "energy: " << et << std::endl;
+    std::cout << "energy: " << et << " ieta: " << ieta << std::endl;
     for(int i=0;i<8;i++)
       {
 	if (abs(ieta) <= 15 )
 	  {
 	    pulse_shape_exl_HB_3[abs(ieta)]->Fill(i, ts_adc[i]);
+	  }
+	if (abs(ieta) > 15 && abs(ieta) < 29 )
+	  {
+	    pulse_shape_exl_HE_3[abs(ieta)]->Fill(i, ts_adc[i]);
 	  }
       }
     if (et > 0.5)
@@ -173,16 +175,16 @@ int main(int argc, char* argv[])
 
 	  else if (abs(ieta) > 15 && abs(ieta) < 29 )
 	    {          
-	      pulse_shape_exl_HE_3[abs(ieta)]->Fill(i, (float)ts_adc[i]);
+	      pulse_shape_exl_HE_3[abs(ieta)]->Fill(i, ts_adc[i]);
 	      
 	      // now fill in the individual ieta bins histograms with energy binning
 	      if (et <= 10 )
 		{
-		  pulse_shape_exl_HE_1[abs(ieta)]->Fill(i, (float)ts_adc[i]);
+		  pulse_shape_exl_HE_1[abs(ieta)]->Fill(i, ts_adc[i]);
 		}
 	      else if (et > 10 ) 
 		{
-		  pulse_shape_exl_HE_2[abs(ieta)]->Fill(i, (float)ts_adc[i]);
+		  pulse_shape_exl_HE_2[abs(ieta)]->Fill(i, ts_adc[i]);
 		}
 	    }
 	}
