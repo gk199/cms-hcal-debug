@@ -78,7 +78,7 @@ int main(int argc, char* argv[])
   int     soi = 0;
   int     event = 0;
   double  TP_energy_depth[8] = {0};
-  int     tp_ts_adc[8] = {0};
+  int     ts_adc[8] = {};
   //  int  TP_pulse_shape[8] = {0};
 
   // SetBranchAddress for the varaibles accessed from the input file
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   tchain->SetBranchAddress("soi", &soi);
   tchain->SetBranchAddress("event", &event);
   tchain->SetBranchAddress("TP_energy_depth", TP_energy_depth);
-  tchain->SetBranchAddress("tp_ts_adc", tp_ts_adc);
+  tchain->SetBranchAddress("ts_adc", ts_adc);
   //  tchain->SetBranchAddress("TP_pulse_shape", TP_pulse_shape);
 
   // setup necessary histograms for HCAL Barrel region
@@ -135,7 +135,14 @@ int main(int argc, char* argv[])
     
     if (soi >= 255 ) continue;
     if (abs(ieta) >= 29 ) continue; // these are events in the HCAL Forward region
-
+    //    std::cout << "energy: " << et << std::endl;
+    for(int i=0;i<8;i++)
+      {
+	if (abs(ieta) <= 15 )
+	  {
+	    pulse_shape_exl_HB_3[abs(ieta)]->Fill(i, ts_adc[i]);
+	  }
+      }
     if (et > 0.5)
       //std::cout << "get entry: " << i << std::endl;
       //std::cout << "soi: " << soi << std::endl;
@@ -148,16 +155,17 @@ int main(int argc, char* argv[])
 	  //******************************** HCAL Barrel events  ****************************************                                                                                                                                         
 	  if (abs(ieta) <= 15 )
 	    {
-	      pulse_shape_exl_HB_3[abs(ieta)]->Fill(i, (float)tp_ts_adc[i]);
+	      std::cout << "in barrel loop" << std::endl;
+	      pulse_shape_exl_HB_3[abs(ieta)]->Fill(i, ts_adc[i]);
 
 	      // now fill in the individual ieta bins histograms with energy binning                                                        
 	      if (et <= 10 )
                 {
-		  pulse_shape_exl_HB_1[abs(ieta)]->Fill(i, (float)tp_ts_adc[i]);
+		  pulse_shape_exl_HB_1[abs(ieta)]->Fill(i, ts_adc[i]);
                 }
 	      else if (et > 10 )
                 {
-                  pulse_shape_exl_HB_2[abs(ieta)]->Fill(i, (float)tp_ts_adc[i]);
+                  pulse_shape_exl_HB_2[abs(ieta)]->Fill(i, ts_adc[i]);
 		}
 	    }
 
@@ -165,16 +173,16 @@ int main(int argc, char* argv[])
 
 	  else if (abs(ieta) > 15 && abs(ieta) < 29 )
 	    {          
-	      pulse_shape_exl_HE_3[abs(ieta)]->Fill(i, (float)tp_ts_adc[i]);
+	      pulse_shape_exl_HE_3[abs(ieta)]->Fill(i, (float)ts_adc[i]);
 	      
 	      // now fill in the individual ieta bins histograms with energy binning
 	      if (et <= 10 )
 		{
-		  pulse_shape_exl_HE_1[abs(ieta)]->Fill(i, (float)tp_ts_adc[i]);
+		  pulse_shape_exl_HE_1[abs(ieta)]->Fill(i, (float)ts_adc[i]);
 		}
 	      else if (et > 10 ) 
 		{
-		  pulse_shape_exl_HE_2[abs(ieta)]->Fill(i, (float)tp_ts_adc[i]);
+		  pulse_shape_exl_HE_2[abs(ieta)]->Fill(i, (float)ts_adc[i]);
 		}
 	    }
 	}

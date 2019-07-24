@@ -22,6 +22,7 @@
 // system include files
 #include <memory>
 #include <array>
+#include <vector>
 #include <algorithm>
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -165,7 +166,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       double tp_energy_depth_[8] = {0.0};
       int tp_soi_;
   // int tp_pulse_shape_[8] = {};
-  int tp_ts_adc_[8] = {0};          
+      int tp_ts_adc_[8] = {0};          
 
       double tpsplit_energy_;  
       double tpsplit_oot_;
@@ -243,7 +244,8 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tps_->Branch("depth_end", &tp_depth_end_);
    tps_->Branch("soi", &tp_soi_);
    tps_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
-   tps_->Branch("tp_ts_adc", &tp_ts_adc_, "tp_ts_adc[8]/I");    
+   tps_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
+   //   tps_->Branch("tp_ts_adc", tp_ts_adc_, "tp_ts_adc[8]/I");    
    //   tps_->Branch("TP_pulse_shape", tp_pulse_shape_, "TP_pulse_shape[8]/I");
    tps_->Branch("event", &event_);
 
@@ -555,9 +557,11 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       tp_depth_start_ = -1;
       tp_depth_end_ = -1;
       tp_depth_max_ = -1;
+
       memset(tp_energy_depth_, 0, sizeof(tp_energy_depth_));
       memset(tp_ts_adc_, 0, sizeof(tp_ts_adc_));                 
       //      memset(tp_pulse_shape_, 0, sizeof(tp_pulse_shape_));
+
       int et_max = 0;
       int et_sum = 0;
 
