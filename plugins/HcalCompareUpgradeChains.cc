@@ -165,7 +165,6 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       int tp_depth_end_;
       double tp_energy_depth_[8] = {0.0};
       int tp_soi_;
-  // int tp_pulse_shape_[8] = {};
       int tp_ts_adc_[8] = {0};          
 
       double tpsplit_energy_;  
@@ -245,8 +244,6 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tps_->Branch("soi", &tp_soi_);
    tps_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
    tps_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
-   //   tps_->Branch("tp_ts_adc", tp_ts_adc_, "tp_ts_adc[8]/I");    
-   //   tps_->Branch("TP_pulse_shape", tp_pulse_shape_, "TP_pulse_shape[8]/I");
    tps_->Branch("event", &event_);
 
    // these are the gen particle branches in the tps tree, and are filled in order of b quark pt
@@ -261,6 +258,7 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch_->Branch("soi", &tp_soi_);
    tpsmatch_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
    tpsmatch_->Branch("event", &event_);
+   tpsmatch_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
 
    // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt   
    tpsmatch_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
@@ -620,7 +618,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       //      printf("TP detector ieta= %d , iphi= %d \n",tp_ieta_,tp_iphi_);
       //      printf("physical eta= %f, phi= %f\n",tp_eta_,tp_phi_);
 
-      // Fill the reduced tps_ tree: tpsmatch_
+      // Fill the reduced tps_ tree: tpsmatch_ this is only filled for gen matched particles
       float dRmin(999.);
 
       for (auto & it : partons) {
@@ -768,16 +766,28 @@ double HcalCompareUpgradeChains::deltaR(double eta1, double phi1, double eta2, d
 
 double HcalCompareUpgradeChains::etaVal(int ieta) {
 
-  double ietaBins=58.;
-  double ietaBinsHF=3.;
+  //  double ietaBins=58.;
+  //  double ietaBinsHF=3.;
 
   double etavl;
+  if (ieta <= -24){
+    etavl = .1695*ieta + 1.9931;
+  }
+  else if (ieta <= -1){
+    etavl = .0875*ieta + .0489;
+  }
+  else if (ieta < 24){
+    etavl = .0875*ieta - .0489;
+  }
+  else {
+    etavl = .1695*ieta - 1.9931;
+  }
 
-  if (abs(ieta)>=29) { // HF 
+  /*  if (abs(ieta)>=29) { // HF 
     etavl=(double)ieta*(0.2/ietaBinsHF);
   } else { // HBHE
     etavl=(double)ieta*(0.6/ietaBins);
-  }
+    } */
 
   return etavl;
 
@@ -789,6 +799,9 @@ double HcalCompareUpgradeChains::phiVal(int iphi) {
 
   double phivl;
   phivl=double(iphi)*(2.*TMath::Pi()/phiBins);
+
+  if (iphi > 36)
+    phivl -= 2.*TMath::Pi();
 
   return phivl;
 
