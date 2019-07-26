@@ -46,7 +46,7 @@ r.gStyle.SetOptStat(0)
 
 path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/output_histograms_ps_mh2000_mx975_pl10000_ev1000.root"
+out1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/output_histograms_ps_QCD.root"
 
 # start defining functions
 def processData(path, out, mode):
