@@ -101,10 +101,10 @@ In python/customise.py, compare_tp_reco: replace 'HcalCompareLegacyChains' with 
 See an example config file in test/analyze_325170.py
 There exist now upgradeTPs-104X, upgradeTPs-106X branches rebased in 104X, 106X respectively.  
 
-### Specifics for energy-depth information workflow
+### Specifics for energy-depth and pulse-shape workflow
 Workflow (Gillian Kopp, June 2019):
 
-Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit plugins/HcalCompareUpgradeChains.cc (for energy-depth, added "tp_energy_depth_[8]" to tps branch) and analyze_run3.py (list the MC ROOT files to use - currently set up with QCD and LLP Run 3 MC files). Compile and run with:
+Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug, edit plugins/HcalCompareUpgradeChains.cc (for energy-depth, added branch "tp_energy_depth_[8]" to tps and tpsmatch tree; for pulse shape, added branch "tp_ts_adc_[8]" to tps and tpsmatch tree) and analyze_run3.py (list the MC ROOT files to use - currently set up with QCD and LLP Run 3 MC files). Compile and run with:
     
     scram b -j 4
     cd test
@@ -112,7 +112,7 @@ Working in /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDeb
     source runcrab3.sh
     cmsRun analyze_run3.py
 
-This will output "analyze.root" with TP (tps branch, and tps_match with Gen matching information for QCD and LLP). Move to QCD/ or LLP/ directory on EOS (/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles), depending on input ROOT files.
+This will output "analyze.root" with TP (tps branch, and tps_match with gen matching information for QCD and LLP). In the "tpsmatch" branch, TPs are only saved if they meet the hard scattering, PDG ID, transverse energy, detector acceptance, and delta R matching between the TP and gen parton (DeltaR < 0.5).  Move to QCD/ or LLP/ directory on EOS (/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles), depending on input ROOT files.
 
 run.C makes histograms from ntuples resulting from cms-hcal-debug packages (analyze.root from previous file). This is currently set to do mode 1 (energy fraction vs. depth) and looks at the TP tree compareReemulRecoSeverity9/tps. run_2bins.C looks at the TP tree compareReemulRecoSeverity9/tps_match with Gen Matching between TPs and MC samples. run_2bins.C splits into 0.5-10 GeV and 10+ GeV, and is used for LLP analysis. Run this with:
 
@@ -125,7 +125,7 @@ run.C makes histograms from ntuples resulting from cms-hcal-debug packages (anal
 This will output "output_histograms_QCD.root" "output_histograms_LLP.root", which is needed for the plotting step.
 
 #### run.C and plotting options
-run.C makes histograms from ntuples, and is set to split events into three transverse energy bins (0.5-10 GeV, 10-30 GeV, 30+ GeV). run_2bins.C is similar, but only makes 2 energy bins (0.5-10 GeV, 10+ GeV), and is often used for LLP samples.
+run.C makes histograms from ntuples, and is set to split events into three transverse energy bins (0.5-10 GeV, 10-30 GeV, 30+ GeV). run_2bins.C is similar, but only makes 2 energy bins (0.5-5 GeV, 5+ GeV), and is often used for LLP samples.
 
 plot_simple.py has the paths to QCD and TTbar directories, output files, and mode = 1 set. These are used as inputs to ./run again, and then plot_simple.py creates many plots in /outPlots_fraction. No input arguments are needed - just check that path1, path2, mode, out1, out2 are correct.
 
@@ -138,3 +138,14 @@ plot_QCD_LLP.py, plot_QCD_2LLP.py, and plot_QCD_3LLP.py are set to run over ROOT
     python plot_QCD_LLP.py
     
 Currently run.C and plot_simple.py are set up for analyzing TPs in the HCAL barrel and endcap region, with the Run 3 HCAL segmentation (up to 4 depth layers in HB, up to 7 in HE).
+
+#### Specifics for pulse-shape workflow
+HcalCompareUpgradeChains.cc puts the pulse shape information (digi, 8 time slices) in the trees tps and tpsmatch, as branches tp_ts_adc. To make the histogram plots for this, use run_pulse_shape.C (which splits in 2 energy bins, 0.5-5 GeV, 5+ GeV) and plot_pluse_shape.py. These are run with:
+    
+    g++ -o run_pulse_shape run_pulse_shape.C  `root-config --cflags --glibs`
+    ./run_pulse_shape <path to analyze.root file> <path and name of output histogram>.root 1
+    
+    cmsenv
+    python plot_pulse_shape.py 
+
+plot_pluse_shape.py only plots one sample at a time, and splits up the pulse shape plots by ieta region. Plots are made for 0.5-5 GeV, 5+ GeV, and inclusive energy region.
