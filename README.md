@@ -148,4 +148,4 @@ HcalCompareUpgradeChains.cc puts the pulse shape information (digi, 8 time slice
     cmsenv
     python plot_pulse_shape.py 
 
-plot_pluse_shape.py only plots one sample at a time, and splits up the pulse shape plots by ieta region. Plots are made for 0.5-5 GeV, 5+ GeV, and inclusive energy region.
+plot_pluse_shape.py plots one sample at a time, and splits up the pulse shape plots by ieta region. Plots are made for 0.5-5 GeV, 5+ GeV, and inclusive energy region, and have the average point overlayed on the colz plot. plot_pulse_shape_overlay.py allows for overlaying the average pulse shape from two samples (QCD, LLP).
