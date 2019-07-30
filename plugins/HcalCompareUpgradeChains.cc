@@ -166,6 +166,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       double tp_energy_depth_[8] = {0.0};
       int tp_soi_;
       int tp_ts_adc_[8] = {0};          
+      double min_deltaR_;
 
       double tpsplit_energy_;  
       double tpsplit_oot_;
@@ -245,6 +246,7 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tps_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
    tps_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
    tps_->Branch("event", &event_);
+   tps_->Branch("min_deltaR", &min_deltaR_);
 
    // these are the gen particle branches in the tps tree, and are filled in order of b quark pt
    tps_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D"); 
@@ -259,6 +261,7 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
    tpsmatch_->Branch("event", &event_);
    tpsmatch_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
+   tpsmatch_->Branch("min_deltaR", &min_deltaR_);
 
    // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt   
    tpsmatch_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
@@ -603,7 +606,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	});
 
       tp_soi_ = digi.SOI_compressedEt();
-      tps_->Fill();
+      //      tps_->Fill();
 
       
       //      HcalDetId hcaldetid(id);
@@ -630,6 +633,10 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi()); 
 	if (dR<dRmin) dRmin=dR;
       }
+
+      // add the min delta R value to the tps tree to check for a reasonable deltaR cut
+      min_deltaR_ = dRmin;
+      tps_->Fill();
 
       // Only keep the TP if each associated to a b-quark from the LLP
       if(dRmin<0.5) {  tpsmatch_->Fill(); }
