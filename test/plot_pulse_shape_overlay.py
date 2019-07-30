@@ -5,6 +5,7 @@
 # need to do cmsenv first to point toward the right source files   
 # python plot_simple.py /afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/FilesToPlot/ compareReemulRecoSeverity9/tps 1  
 # this is specifically designed for plotting pulse shapes, resulting from run_pulse_shape.C
+# plot_pulse_shape_overlay is for overlaying the average of two samples (QCD, LLP)
 
 # import statements
 import ROOT as r
@@ -35,7 +36,7 @@ start = time.clock()
 #_constrain = [" && etsum > 0.5 && etsum <= 10"," && etsum > 10 && etsum <= 30"," && etsum > 30"]
 
 # this is directory where the output plots will be stored
-folder = "./outPlots_pulse_shape/"
+folder = "./outPlots_pulse_shape_overlay/"
 try:
   os.makedirs(folder)
 except OSError:
@@ -46,9 +47,11 @@ r.gStyle.SetOptStat(0)
 
 #path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/"
 path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl10000_ev1000/"
+path2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins_0pt5_5/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
 #out1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/output_histograms_ps_mh2000_mx975_pl10000_ev1000.root"
 out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl10000_ev1000/output_histograms_ps_mh2000_mx975_pl10000_ev1000.root"
+out2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins_0pt5_5/output_histograms_ps_QCD.root"
 
 # start defining functions
 def processData(path, out, mode):
@@ -60,6 +63,8 @@ def processData(path, out, mode):
 
 if not process == 0:
   print("Generating histograms from NTuples, please wait a while...")
+  proc2 = multiprocessing.Process(target=processData, args=(path2,out2,mode))
+  proc2.start()
   # processing the first path
   _files = [f for f in os.listdir(path1) if f.endswith(".root")]
   _numf = len(_files)
@@ -88,6 +93,7 @@ if not process == 0:
       _num = _num + 1
     for thread in _record:
       thread.join()
+    proc2.join()
     os.system("rm -rf ./" + out1)
     os.system("hadd " + out1 + " 1temp*.root")
     os.system("rm -rf ./1temp*.root")
@@ -107,6 +113,7 @@ if not process == 0:
         _num = _num + 1 
       for thread in _record:
         thread.join()
+      proc2.join()
       os.system("rm -rf ./" + out1)
       os.system("hadd " + out1 + " 1temp*.root")
       os.system("rm -rf ./1temp*.root")
@@ -114,11 +121,15 @@ if not process == 0:
       proc1 = multiprocessing.Process(target=processData, args=(path1,out1,mode))
       proc1.start()
       proc1.join()
+      proc2.join()
 
 print("Plotting histograms...")
 f1 = r.TFile(out1)
+f2 = r.TFile(out2)
 if (f1.IsZombie() or (not f1.IsOpen())):
   print FAIL + "Error: cannot open " + out1 + " or the file is not valid,please check if filename is valid!" + END
+if (f2.IsZombie() or (not f2.IsOpen())):
+  print FAIL + "Error: cannot open " + out2 + " or the file is not valid,please check if filename is valid!" + END
 
 r.gStyle.SetTitleFontSize(0.1)
 r.gStyle.SetTitleXSize(0.1)
@@ -128,30 +139,50 @@ r.gStyle.SetPadLeftMargin(.1)
 r.gStyle.SetPadRightMargin(.12)
 r.gStyle.SetPadTopMargin(.12)
 
-def getHists(name, f1, ymax=1, title=0):
+def getHists(name, f1, f2, ymax=1, title=0):
   yMax = 0
   t1 = f1.Get(name)
+  t2 = f2.Get(name)
   t1.Draw("colz")
-  t1_p = t1
-#  t1_p = t1.ProfileX(name+"_p")
-#  yMax = t1_p.GetMaximum()
-  yMax = 30
+  t1_p = t1.ProfileX(name+"_1")
+  t2_p = t2.ProfileX(name+"_2")
+  if t1_p.GetMaximum() > t2_p.GetMaximum():
+    yMax = t1_p.GetMaximum()
+  else:
+    yMax = t2_p.GetMaximum()
+  if ymax:
+    yMax = 2
+  else:
+    yMax = yMax * 1.2
 
   t1_p.SetLineColor(1)
   t1_p.SetLineWidth(1)
   t1_p.SetMarkerColor(1)
   t1_p.SetMarkerStyle(20)
   t1_p.SetAxisRange(0,yMax,"Y")
-  
+  t2_p.SetLineColor(2)
+  t2_p.SetLineWidth(1)
+  t2_p.SetMarkerColor(2)
+  t2_p.SetMarkerStyle(20)
+  t2_p.SetAxisRange(0,yMax,"Y")
+
   t1_p.SetTitle("")
   t1_p.SetTitleOffset(0.8,"x")
   t1_p.SetTitleOffset(1.2,"y")
   t1_p.SetTitleSize(0.035,"xyz")
+
+  t2_p.SetTitle("")
+  t2_p.SetTitleOffset(0.8,"x")
+  t2_p.SetTitleOffset(1.2,"y")
+  t2_p.SetTitleSize(0.035,"xyz")
+
   if not title:
     t1_p.GetXaxis().SetLabelSize(0.06)
     t1_p.GetYaxis().SetLabelSize(0.06)
+    t2_p.GetXaxis().SetLabelSize(0.06)
+    t2_p.GetYaxis().SetLabelSize(0.06)
 
-  return t1_p
+  return t1_p, t2_p
 
 # for saving histograms and plots
 output = "Pulse_Shape_HE"
@@ -179,9 +210,9 @@ for energy in range(1,4):
     r.gPad.SetGridx(r.kTRUE)
     r.gPad.SetGridy(r.kTRUE)
     Pulse_Shape_eta_en_HE = "Pulse_Shape_HE_Abs(eta){}_{}".format(eta,energy)
-    Pulse_Shape_t1_p = getHists(Pulse_Shape_eta_en_HE, f1)
+    Pulse_Shape_t1_p, Pulse_Shape_t2_p = getHists(Pulse_Shape_eta_en_HE, f1, f2, 0, 1)
     Pulse_Shape_t1_p.Draw("colz")
-    Pulse_Shape_t1_p.ProfileX(Pulse_Shape_eta_en_HE+"_p").Draw("same")
+    Pulse_Shape_t2_p.Draw("same")
 
     Pulse_Shape_t1_p.SetTitle("iEta {}".format(eta))
     Pulse_Shape_t1_p.GetXaxis().SetTitle("TS");
@@ -189,6 +220,12 @@ for energy in range(1,4):
     Pulse_Shape_t1_p.SetTitleSize(0.07,"xy")
     Pulse_Shape_t1_p.SetTitleOffset(0.8,"x")
     Pulse_Shape_t1_p.SetTitleOffset(0.85,"y")
+
+    leg = r.TLegend(0.65,0.65,0.95,0.85)
+    leg.AddEntry(Pulse_Shape_t1_p,"LLP MC")
+    leg.AddEntry(Pulse_Shape_t2_p,"QCD MC")
+    leg.Draw("same")
+
     num = num + 1
   c.cd()
 #  c.SaveAs(outfile)
@@ -220,9 +257,9 @@ for energy in range(1,4):
     r.gPad.SetGridy(r.kTRUE)
     Pulse_Shape_eta_en_HB = "Pulse_Shape_HB_Abs(eta){}_{}".format(eta,energy)
     #print("eta, energy {}, {}".format(eta,energy))
-    Pulse_Shape_t1_p = getHists(Pulse_Shape_eta_en_HB, f1)
+    Pulse_Shape_t1_p, Pulse_Shape_t2_p = getHists(Pulse_Shape_eta_en_HB, f1, f2, 0, 1)
     Pulse_Shape_t1_p.Draw("colz")
-    Pulse_Shape_t1_p.ProfileX(Pulse_Shape_eta_en_HB+"_p").Draw("same")
+    Pulse_Shape_t2_p.Draw("same")
 
     Pulse_Shape_t1_p.SetTitle("iEta {}".format(eta))
     Pulse_Shape_t1_p.GetXaxis().SetTitle("TS");
@@ -230,6 +267,12 @@ for energy in range(1,4):
     Pulse_Shape_t1_p.SetTitleSize(0.09,"xy")
     Pulse_Shape_t1_p.SetTitleOffset(0.6,"x")
     Pulse_Shape_t1_p.SetTitleOffset(0.65,"y")
+
+    leg = r.TLegend(0.65,0.65,0.95,0.85)
+    leg.AddEntry(Pulse_Shape_t1_p,"LLP MC")
+    leg.AddEntry(Pulse_Shape_t2_p,"QCD MC")
+    leg.Draw("same")
+
     num = num + 1
   c.cd()
 #  c.SaveAs(outfile)
