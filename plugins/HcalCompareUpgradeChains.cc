@@ -149,6 +149,8 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
 
       TTree *tps_;
       TTree *tpsmatch_;
+      TTree *tpsmatch1_;
+      TTree *tpsmatch2_;
       TTree *tpsplit_;
       TTree *events_;
       TTree *matches_;
@@ -267,6 +269,37 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
    tpsmatch_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
    tpsmatch_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
+
+   tpsmatch1_ = fs->make<TTree>("tps_match1", "Trigger primitives matched to GEN particles, DR1");
+   tpsmatch1_->Branch("et", &tp_energy_);
+   tpsmatch1_->Branch("ieta", &tp_ieta_);
+   tpsmatch1_->Branch("iphi", &tp_iphi_);
+   tpsmatch1_->Branch("soi", &tp_soi_);
+   tpsmatch1_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
+   tpsmatch1_->Branch("event", &event_);
+   tpsmatch1_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
+   tpsmatch1_->Branch("min_deltaR", &min_deltaR_);
+
+   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt                                                                                                 
+   tpsmatch1_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
+   tpsmatch1_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
+   tpsmatch1_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
+
+   tpsmatch2_ = fs->make<TTree>("tps_match2", "Trigger primitives matched to GEN particles, DR2");
+   tpsmatch2_->Branch("et", &tp_energy_);
+   tpsmatch2_->Branch("ieta", &tp_ieta_);
+   tpsmatch2_->Branch("iphi", &tp_iphi_);
+   tpsmatch2_->Branch("soi", &tp_soi_);
+   tpsmatch2_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
+   tpsmatch2_->Branch("event", &event_);
+   tpsmatch2_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
+   tpsmatch2_->Branch("min_deltaR", &min_deltaR_);
+
+   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt                                                                                                 
+   tpsmatch2_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
+   tpsmatch2_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
+   tpsmatch2_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
+
 
    tpsplit_ = fs->make<TTree>("tpsplit", "Trigger primitives");
    tpsplit_->Branch("et", &tpsplit_energy_);
@@ -461,6 +494,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
 
      if ( (abs(pdgId)>=1 && abs(pdgId)<=5) || abs(pdgId)==21) {
+       //     if ( (abs(pdgId)==5) )  { // check specifically for the b quark from the LLP decay
        partons.push_back(p4);
      }
      /*
@@ -622,7 +656,8 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       //      printf("physical eta= %f, phi= %f\n",tp_eta_,tp_phi_);
 
       // Fill the reduced tps_ tree: tpsmatch_ this is only filled for gen matched particles
-      float dRmin(999.);
+      // float dRmin(999.);
+      float dRmin = 999.;
 
       for (auto & it : partons) {
 
@@ -632,15 +667,19 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi()); 
 	if (dR<dRmin) dRmin=dR;
+
+	//	printf("pt= %f, eta= %f, dR= %f, min_dR= %f\n",it.pt(),it.eta(),dR,dRmin);
       }
 
       // add the min delta R value to the tps tree to check for a reasonable deltaR cut
       min_deltaR_ = dRmin;
+      //      printf("min dR= %f\n",min_deltaR_);
       tps_->Fill();
 
       // Only keep the TP if each associated to a b-quark from the LLP
+      if(dRmin<2) {  tpsmatch2_->Fill(); }
+      if(dRmin<1) {  tpsmatch1_->Fill(); }
       if(dRmin<0.5) {  tpsmatch_->Fill(); }
-
 
       if (et_sum > 0) {
 	  for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
