@@ -151,6 +151,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       TTree *tpsmatch_;
       TTree *tpsmatch1_;
       TTree *tpsmatch2_;
+      TTree *tpsmatch3_;
       TTree *tpsplit_;
       TTree *events_;
       TTree *matches_;
@@ -249,7 +250,6 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tps_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
    tps_->Branch("event", &event_);
    tps_->Branch("min_deltaR", &min_deltaR_);
-
    // these are the gen particle branches in the tps tree, and are filled in order of b quark pt
    tps_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D"); 
    tps_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D"); 
@@ -264,7 +264,6 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch_->Branch("event", &event_);
    tpsmatch_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
    tpsmatch_->Branch("min_deltaR", &min_deltaR_);
-
    // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt   
    tpsmatch_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
    tpsmatch_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
@@ -279,8 +278,7 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch1_->Branch("event", &event_);
    tpsmatch1_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
    tpsmatch1_->Branch("min_deltaR", &min_deltaR_);
-
-   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt                                                                                                 
+   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt                                                           
    tpsmatch1_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
    tpsmatch1_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
    tpsmatch1_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
@@ -294,11 +292,24 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch2_->Branch("event", &event_);
    tpsmatch2_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
    tpsmatch2_->Branch("min_deltaR", &min_deltaR_);
-
-   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt                                                                                                 
+   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt                                                             
    tpsmatch2_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
    tpsmatch2_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
    tpsmatch2_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
+
+   tpsmatch3_ = fs->make<TTree>("tps_match3", "Trigger primitives matched to GEN particles, DR3");
+   tpsmatch3_->Branch("et", &tp_energy_);
+   tpsmatch3_->Branch("ieta", &tp_ieta_);
+   tpsmatch3_->Branch("iphi", &tp_iphi_);
+   tpsmatch3_->Branch("soi", &tp_soi_);
+   tpsmatch3_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
+   tpsmatch3_->Branch("event", &event_);
+   tpsmatch3_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
+   tpsmatch3_->Branch("min_deltaR", &min_deltaR_);
+   // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt                               
+   tpsmatch3_->Branch("gen_b_pt",gen_b_pt_, "gen_b_pt_[4]/D");
+   tpsmatch3_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
+   tpsmatch3_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
 
 
    tpsplit_ = fs->make<TTree>("tpsplit", "Trigger primitives");
@@ -677,6 +688,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       tps_->Fill();
 
       // Only keep the TP if each associated to a b-quark from the LLP
+      if(dRmin<3) {  tpsmatch3_->Fill(); }
       if(dRmin<2) {  tpsmatch2_->Fill(); }
       if(dRmin<1) {  tpsmatch1_->Fill(); }
       if(dRmin<0.5) {  tpsmatch_->Fill(); }
