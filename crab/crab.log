@@ -204,3 +204,78 @@ Traceback (most recent call last):
     raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
 ConfigException: Working area '/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/crab/crab_projects_out/crab_QCD_MC_PU' already exists 
 Please change the requestName in the config file
+DEBUG 2019-08-01 11:51:47,849: 	 Executing command: 'submit'
+DEBUG 2019-08-01 11:51:47,850: 	 Found CRAB cache file /afs/cern.ch/user/g/gkopp/.crab3
+DEBUG 2019-08-01 11:51:47,878: 	 Checking credentials
+DEBUG 2019-08-01 11:51:47,878: 	 Proxy file /tmp/x509up_u101898 not found
+DEBUG 2019-08-01 11:51:47,878: 	 Creating new proxy for 24:00 hours with VO group '' and VO role 'NULL'.
+DEBUG 2019-08-01 11:51:51,993: 	 Executing : 
+ command : voms-proxy-init -voms cms:/cms -valid 24:00 -rfc
+ output : None
+ error: None
+ retcode : 1
+DEBUG 2019-08-01 11:51:52,598: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u101898 -timeleft
+ output : 
+ error: Proxy not found: /tmp/x509up_u101898 (No such file or directory)
+
+ retcode : 1
+ERROR 2019-08-01 11:51:52,598: 	 Error while checking proxy timeleft for /tmp/x509up_u101898
+DEBUG 2019-08-01 11:51:53,204: 	 Executing : 
+ command : env X509_USER_PROXY=/tmp/x509up_u101898 voms-proxy-info -fqan
+ output : 
+ error: Proxy not found: /tmp/x509up_u101898 (No such file or directory)
+
+ retcode : 1
+ERROR 2019-08-01 11:51:53,204: 	 Problems creating proxy.
+ERROR 2019-08-01 11:51:53,205: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 161, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 305, in __init__
+    self.proxyCreated = self.proxy.createNewVomsProxySimple(timeLeftThreshold = 720)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/CredentialInteractions.py", line 126, in createNewVomsProxySimple
+    raise ProxyCreationException("Problems creating proxy.")
+ProxyCreationException: Problems creating proxy.
+DEBUG 2019-08-02 10:51:20,713: 	 Executing command: 'submit'
+DEBUG 2019-08-02 10:51:20,715: 	 Found CRAB cache file /afs/cern.ch/user/g/gkopp/.crab3
+DEBUG 2019-08-02 10:51:20,754: 	 Checking credentials
+DEBUG 2019-08-02 10:51:20,754: 	 Found proxy file /tmp/x509up_u101898
+DEBUG 2019-08-02 10:51:20,754: 	 Getting proxy life time left
+DEBUG 2019-08-02 10:51:21,564: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u101898 -timeleft
+ output : 604079
+
+ error: 
+ retcode : 0
+DEBUG 2019-08-02 10:51:22,376: 	 Executing : 
+ command : voms-proxy-info -file /tmp/x509up_u101898 -actimeleft
+ output : 604078
+
+ error: 
+ retcode : 0
+DEBUG 2019-08-02 10:51:22,377: 	 Proxy lifetime 604079 secs is different from voms extension lifetime 604078 secs for proxy: /tmp/x509up_u101898
+DEBUG 2019-08-02 10:51:22,377: 	 Proxy valid for 167:47:58 hours
+INFO 2019-08-02 10:51:22,377: 	 Will use CRAB configuration file crab_Data_config.py
+DEBUG 2019-08-02 10:51:22,377: 	 Loading CRAB configuration file.
+DEBUG 2019-08-02 10:51:22,409: 	 Will use CRAB Analysis plugin (i.e. will run an analysis job type).
+ERROR 2019-08-02 10:51:22,410: 	 Working area '/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/crab/crab_projects_out/crab_QCD_MC_PU' already exists 
+Please change the requestName in the config file
+ERROR 2019-08-02 10:51:22,411: 	 Caught exception
+Traceback (most recent call last):
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 161, in <module>
+    client()
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/bin/crab", line 146, in __call__
+    self.cmd = sub_cmd(self.logger, args[1:])
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/submit.py", line 34, in __init__
+    SubCommand.__init__(self, logger, cmdargs, disable_interspersed_args=True)
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/Commands/SubCommand.py", line 315, in __init__
+    getattr(self.configuration.General, 'requestName', None))
+  File "/cvmfs/cms.cern.ch/crab3/slc6_amd64_gcc493/cms/crabclient/3.3.1904/lib/python2.7/site-packages/CRABClient/ClientUtilities.py", line 404, in createWorkArea
+    raise ConfigException("Working area '%s' already exists \nPlease change the requestName in the config file" % fullpath)
+ConfigException: Working area '/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/crab/crab_projects_out/crab_QCD_MC_PU' already exists 
+Please change the requestName in the config file

@@ -163,7 +163,7 @@ sg12
 I00
 sS'unitsPerJob'
 p62
-I1
+I4
 sg13
 S''
 sg14
@@ -197,7 +197,7 @@ S'/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/'
 p72
 sg25
 Nsg67
-I4
+I1
 sbsg29
 g3
 (g9
@@ -243,7 +243,7 @@ S'prod'
 p87
 sS'RequestName'
 p88
-V190731_095714:gkopp_crab_QCD_MC_PU
+V190802_085214:gkopp_crab_QCD_MC_PU
 p89
 sS'voRole'
 p90

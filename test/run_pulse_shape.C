@@ -44,7 +44,10 @@ int main(int argc, char* argv[])
 
   // which tree to look at from the input file, here only looking at Trigger Primatives (TPs)
   //treeList = "compareReemulRecoSeverity9/tps";
-  treeList = "compareReemulRecoSeverity9/tps_match";
+  //treeList = "compareReemulRecoSeverity9/tps_match";
+  //treeList = "compareReemulRecoSeverity9/tps_match1";
+  //treeList = "compareReemulRecoSeverity9/tps_match2";
+  treeList = "compareReemulRecoSeverity9/tps_match3";
 
   TString dir = TString(inputList.c_str());
   TFile *outFile = new TFile(_outFile.c_str(), "RECREATE");
