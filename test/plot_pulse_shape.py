@@ -45,10 +45,10 @@ r.gROOT.SetBatch()
 r.gStyle.SetOptStat(0)
 
 #path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/"
-path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/"
+path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
 #out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/QCD_2bins_10_pulseshape.root"
-out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/LLP_mh2000_pl10000_2bins_10_pulseshape.root"
+out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/LLP_mh2000_pl500_2bins_10_pulseshape.root"
 
 # start defining functions
 def processData(path, out, mode):
@@ -134,8 +134,8 @@ def getHists(name, f1, ymax=1, title=0):
   t1.Draw("colz")
   t1_p = t1
 #  t1_p = t1.ProfileX(name+"_p")
-#  yMax = t1_p.GetMaximum()
-  yMax = 150
+  yMax = t1_p.GetMaximum()
+#  yMax = 300
 
   t1_p.SetLineColor(1)
   t1_p.SetLineWidth(1)
@@ -188,7 +188,7 @@ for energy in range(1,4):
     Pulse_Shape_t1_p.GetYaxis().SetTitle("ADC");
     Pulse_Shape_t1_p.SetTitleSize(0.07,"xy")
     Pulse_Shape_t1_p.SetTitleOffset(0.8,"x")
-    Pulse_Shape_t1_p.SetTitleOffset(0.85,"y")
+    Pulse_Shape_t1_p.SetTitleOffset(0.9,"y")
     num = num + 1
   c.cd()
 #  c.SaveAs(outfile)
@@ -229,7 +229,7 @@ for energy in range(1,4):
     Pulse_Shape_t1_p.GetYaxis().SetTitle("ADC");
     Pulse_Shape_t1_p.SetTitleSize(0.09,"xy")
     Pulse_Shape_t1_p.SetTitleOffset(0.6,"x")
-    Pulse_Shape_t1_p.SetTitleOffset(0.65,"y")
+    Pulse_Shape_t1_p.SetTitleOffset(0.7,"y")
     num = num + 1
   c.cd()
 #  c.SaveAs(outfile)

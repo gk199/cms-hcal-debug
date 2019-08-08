@@ -46,11 +46,11 @@ r.gROOT.SetBatch()
 r.gStyle.SetOptStat(0)
 
 #path1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/"
-path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/"
+path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/"
 path2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
 #out1 = "/afs/cern.ch/work/g/gkopp/HCAL_Trigger/CMSSW_10_6_0/src/Debug/HcalDebug/test/output_histograms_ps_mh2000_mx975_pl10000_ev1000.root"
-out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/LLP_mh2000_pl500_2bins_10_pulseshape.root"
+out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/LLP_mh2000_pl10000_2bins_10_pulseshape.root"
 out2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/QCD_2bins_10_pulseshape.root"
 
 # start defining functions
@@ -160,11 +160,13 @@ def getHists(name, f1, f2, ymax=1, title=0):
   t1_p.SetMarkerColor(1)
   t1_p.SetMarkerStyle(20)
   t1_p.SetAxisRange(0,yMax,"Y")
+#  t1_p.SetAxisRange(0,100,"Y") 
   t2_p.SetLineColor(2)
   t2_p.SetLineWidth(1)
   t2_p.SetMarkerColor(2)
   t2_p.SetMarkerStyle(20)
   t2_p.SetAxisRange(0,yMax,"Y")
+#  t2_p.SetAxisRange(0,100,"Y") 
 
   t1_p.SetTitle("")
   t1_p.SetTitleOffset(0.8,"x")
