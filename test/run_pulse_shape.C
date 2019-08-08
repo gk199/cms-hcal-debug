@@ -96,30 +96,30 @@ int main(int argc, char* argv[])
   // setup necessary histograms for HCAL Barrel region
   // have histograms for each ieta region binned by energy ranges (cannot sum pluse shapes in ieta, so no inclusive plots)
   std::map<int, TH2F*> pulse_shape_exl_HB_3; // all et
-  std::map<int, TH2F*> pulse_shape_exl_HB_1; // 0.5<et<=5
-  std::map<int, TH2F*> pulse_shape_exl_HB_2; // 5<et
+  std::map<int, TH2F*> pulse_shape_exl_HB_1; // 0.5<et<=10
+  std::map<int, TH2F*> pulse_shape_exl_HB_2; // 10<et
   for(int eta=0;eta<_length_ietaHB;eta++)
   {
     pulse_shape_exl_HB_3[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_3",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d, all et",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HB_1[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_1",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 0.5<et<=5",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HB_2[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_2",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 5<et",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
+    pulse_shape_exl_HB_1[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_1",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 0.5<et<=10",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
+    pulse_shape_exl_HB_2[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_2",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 10<et",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
    }
 
   // setup necessary histograms for HCAL Endcap region
   // have histograms for each ieta region binned by energy ranges 
   std::map<int, TH2F*> pulse_shape_exl_HE_3; // all et
-  std::map<int, TH2F*> pulse_shape_exl_HE_1; // 0.5<et<=5
-  std::map<int, TH2F*> pulse_shape_exl_HE_2; // 5<et
+  std::map<int, TH2F*> pulse_shape_exl_HE_1; // 0.5<et<=10
+  std::map<int, TH2F*> pulse_shape_exl_HE_2; // 10<et
   for(int eta=0;eta<_length_ietaHE;eta++)
   {
     pulse_shape_exl_HE_3[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_3",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d, all et",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HE_1[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_1",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 0.5<et<=5",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HE_2[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_2",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 5<et",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
+    pulse_shape_exl_HE_1[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_1",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 0.5<et<=10",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
+    pulse_shape_exl_HE_2[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_2",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 10<et",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
   }
 
   // going through each entry of the input ntuples file
   long int nentries = tchain->GetEntries();
-  std::cout << "energy: " << et << " ieta: " << ieta << std::endl;
+  //std::cout << "energy: " << et << " ieta: " << ieta << std::endl;
 
   std::cout << "The number of entries is: " << nentries << std::endl;
 
@@ -147,11 +147,11 @@ int main(int argc, char* argv[])
 	      pulse_shape_exl_HB_3[abs(ieta)]->Fill(i, ts_adc[i]);
 
 	      // now fill in the individual ieta bins histograms with energy binning                                                        
-	      if (et <= 5 )
+	      if (et <= 10 )
                 {
 		  pulse_shape_exl_HB_1[abs(ieta)]->Fill(i, ts_adc[i]);
                 }
-	      else if (et > 5 )
+	      else if (et > 10 )
                 {
                   pulse_shape_exl_HB_2[abs(ieta)]->Fill(i, ts_adc[i]);
 		}
@@ -164,11 +164,11 @@ int main(int argc, char* argv[])
 	      pulse_shape_exl_HE_3[abs(ieta)]->Fill(i, ts_adc[i]);
 	      
 	      // now fill in the individual ieta bins histograms with energy binning
-	      if (et <= 5 )
+	      if (et <= 10 )
 		{
 		  pulse_shape_exl_HE_1[abs(ieta)]->Fill(i, ts_adc[i]);
 		}
-	      else if (et > 5 ) 
+	      else if (et > 10 ) 
 		{
 		  pulse_shape_exl_HE_2[abs(ieta)]->Fill(i, ts_adc[i]);
 		}

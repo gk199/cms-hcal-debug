@@ -59,15 +59,15 @@ r.gStyle.SetOptStat(0)
 #path = sys.argv[1]
 #tree_path = sys.argv[2]
 #num = sys.argv[3]
-path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins_0pt5_5/"
-path2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl500_ev1000/"
-path3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl1000_ev1000/"
-path4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl10000_ev1000/"
+path1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/"
+path2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/"
+path3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl1000/"
+path4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD_2bins_0pt5_5/output_histograms_QCD_2bins.root"
-out2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl500_ev1000/output_histograms_LLP_mh2000_mx975_pl500_ev1000.root"
-out3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl1000_ev1000/output_histograms_LLP_mh2000_mx975_pl1000_ev1000.root"
-out4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/EnergyDepth_2bins_0pt5_5/LLP_mh2000_mx975_pl10000_ev1000/output_histograms_LLP_mh2000_mx975_pl10000_ev1000.root"
+out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/QCD_2bins_10.root"
+out2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/LLP_mh2000_pl500_2bins_10.root"
+out3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl1000/LLP_mh2000_pl1000_2bins_10.root"
+out4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/LLP_mh2000_pl10000_2bins_10.root"
 # start defining functions
 def processData(path, out, mode):
   print('./run_2bins '+path+' '+out+' '+str(mode))
@@ -291,7 +291,7 @@ Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 0.5-5 GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 0.5-10 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -313,7 +313,7 @@ Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 5+ GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 10+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -384,7 +384,7 @@ Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 0.5-5 GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 0.5-10 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -406,7 +406,7 @@ Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 5+ GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 10+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
