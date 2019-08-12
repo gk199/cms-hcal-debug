@@ -662,6 +662,8 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       double tp_eta_=etaVal(tp_ieta_); //(double)thisCell->etaPos();
       double tp_phi_=phiVal(tp_iphi_); // (double)thisCell->phiPos();
 
+      printf("tp_ieta_= %i, tp_eta_=%f \n", tp_ieta_, tp_eta_);
+
       //      printf("TP detector ieta= %d , iphi= %d and physical eta= %f, phi= %f\n",tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
       //      printf("TP detector ieta= %d , iphi= %d \n",tp_ieta_,tp_iphi_);
       //      printf("physical eta= %f, phi= %f\n",tp_eta_,tp_phi_);
@@ -679,7 +681,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi()); 
 	if (dR<dRmin) dRmin=dR;
 
-	//	printf("pt= %f, eta= %f, dR= %f, min_dR= %f\n",it.pt(),it.eta(),dR,dRmin);
+       	printf("pt= %f, eta= %f, tp_eta= %f, phi= %f, tp_phi= %f, dR= %f, min_dR= %f\n", it.pt(), it.eta(), tp_eta_, it.phi(), tp_phi_, dR, dRmin);
       }
 
       // add the min delta R value to the tps tree to check for a reasonable deltaR cut
