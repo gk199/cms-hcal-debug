@@ -44,10 +44,10 @@ int main(int argc, char* argv[])
 
   // which tree to look at from the input file, here only looking at Trigger Primatives (TPs)
   //treeList = "compareReemulRecoSeverity9/tps";
-  //treeList = "compareReemulRecoSeverity9/tps_match";
+  treeList = "compareReemulRecoSeverity9/tps_match";
   //treeList = "compareReemulRecoSeverity9/tps_match1";
   //treeList = "compareReemulRecoSeverity9/tps_match2";
-  treeList = "compareReemulRecoSeverity9/tps_match3";
+  //treeList = "compareReemulRecoSeverity9/tps_match3";
 
   TString dir = TString(inputList.c_str());
   TFile *outFile = new TFile(_outFile.c_str(), "RECREATE");
@@ -100,9 +100,9 @@ int main(int argc, char* argv[])
   std::map<int, TH2F*> pulse_shape_exl_HB_2; // 10<et
   for(int eta=0;eta<_length_ietaHB;eta++)
   {
-    pulse_shape_exl_HB_3[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_3",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d, all et",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HB_1[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_1",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 0.5<et<=10",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HB_2[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_2",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 10<et",_ietaHB[eta]),8,-0.5,7.5,100,0.,100.);
+    pulse_shape_exl_HB_3[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_3",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d, all et",_ietaHB[eta]),8,-0.5,7.5,100,0.,1000.);
+    pulse_shape_exl_HB_1[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_1",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 0.5<et<=10",_ietaHB[eta]),8,-0.5,7.5,100,0.,1000.);
+    pulse_shape_exl_HB_2[_ietaHB[eta]] = new TH2F(Form("Pulse_Shape_HB_Abs(eta)%d_2",_ietaHB[eta]), Form("TP Pulse Shape HB vs TS, Abs(eta)%d 10<et",_ietaHB[eta]),8,-0.5,7.5,100,0.,1000.);
    }
 
   // setup necessary histograms for HCAL Endcap region
@@ -112,9 +112,9 @@ int main(int argc, char* argv[])
   std::map<int, TH2F*> pulse_shape_exl_HE_2; // 10<et
   for(int eta=0;eta<_length_ietaHE;eta++)
   {
-    pulse_shape_exl_HE_3[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_3",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d, all et",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HE_1[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_1",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 0.5<et<=10",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
-    pulse_shape_exl_HE_2[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_2",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 10<et",_ietaHE[eta]),8,-0.5,7.5,100,0.,100.);
+    pulse_shape_exl_HE_3[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_3",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d, all et",_ietaHE[eta]),8,-0.5,7.5,100,0.,1000.);
+    pulse_shape_exl_HE_1[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_1",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 0.5<et<=10",_ietaHE[eta]),8,-0.5,7.5,100,0.,1000.);
+    pulse_shape_exl_HE_2[_ietaHE[eta]] = new TH2F(Form("Pulse_Shape_HE_Abs(eta)%d_2",_ietaHE[eta]), Form("TP Pulse Shape HE vs TS, Abs(eta)%d 10<et",_ietaHE[eta]),8,-0.5,7.5,100,0.,1000.);
   }
 
   // going through each entry of the input ntuples file
