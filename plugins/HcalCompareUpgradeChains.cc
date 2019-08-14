@@ -594,6 +594,10 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       HcalTrigTowerDetId id = digi.id();
       //      ev_tp_energy_ += decoder->hcaletValue(id.ieta(), id.iphi(), digi.SOI_compressedEt());
       id = HcalTrigTowerDetId(id.ieta(), id.iphi(), 1, id.version());
+
+      // Temporary remove HCAL TPs in HF
+      if (abs(id.ieta()) > 28) continue;
+
       ev_tp_energy_ += decoder->hcaletValue(id,digi.SOI_compressedEt());  
       tpdigis[id].push_back(digi);
 
@@ -652,7 +656,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
       tp_soi_ = digi.SOI_compressedEt();
       //      tps_->Fill();
-
       
       //      HcalDetId hcaldetid(id);
 
@@ -662,31 +665,31 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       double tp_eta_=etaVal(tp_ieta_); //(double)thisCell->etaPos();
       double tp_phi_=phiVal(tp_iphi_); // (double)thisCell->phiPos();
 
-      printf("tp_ieta_= %i, tp_eta_=%f \n", tp_ieta_, tp_eta_);
-
-      //      printf("TP detector ieta= %d , iphi= %d and physical eta= %f, phi= %f\n",tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
-      //      printf("TP detector ieta= %d , iphi= %d \n",tp_ieta_,tp_iphi_);
-      //      printf("physical eta= %f, phi= %f\n",tp_eta_,tp_phi_);
+      printf("TP detector (digi loop) ieta= %d , iphi= %d and physical eta= %f, phi= %f\n",tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
 
       // Fill the reduced tps_ tree: tpsmatch_ this is only filled for gen matched particles
-      // float dRmin(999.);
       float dRmin = 999.;
 
       for (auto & it : partons) {
+	printf("in partons loop with pt = %f and eta = %f \n",it.pt(), it.eta());
 
-	// discard b-quarks outside the detector acceptance
+	// discard b-quarks (and other quarks and gluons) outside the detector acceptance
 	if(it.pt()<20.)continue;
 	if(fabs(it.eta())>2.5) continue;
 
-	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi()); 
+	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi());
+     
+	printf("Delta R checking: Gen pt= %f, eta= %f, phi= %f. TP eta = %f, phi= %f. DeltaR: dR= %f, min_dR= %f\n", it.pt(), it.eta(), it.phi(), tp_eta_, tp_phi_, dR, dRmin);
+	printf("eta diff = %f, phi diff = %f\n", tp_eta_-it.eta(), tp_phi_-it.phi());
+	printf("deltaPhi = %f\n", deltaPhi(tp_phi_, it.phi())); 
+	printf("deltaPhi = %f\n", deltaPhi(it.phi(), tp_phi_));
+	printf("DeltaR cross check calculation = %f\n", sqrt((tp_eta_-it.eta())*(tp_eta_-it.eta())+(deltaPhi(tp_phi_, it.phi()))*(deltaPhi(tp_phi_, it.phi()))));
+  
 	if (dR<dRmin) dRmin=dR;
-
-       	printf("pt= %f, eta= %f, tp_eta= %f, phi= %f, tp_phi= %f, dR= %f, min_dR= %f\n", it.pt(), it.eta(), tp_eta_, it.phi(), tp_phi_, dR, dRmin);
       }
 
       // add the min delta R value to the tps tree to check for a reasonable deltaR cut
       min_deltaR_ = dRmin;
-      //      printf("min dR= %f\n",min_deltaR_);
       tps_->Fill();
 
       // Only keep the TP if each associated to a b-quark from the LLP
@@ -718,7 +721,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
    for (const auto& pair: tpdigis) {
 
-    //printf("************************************************************\n");
+     //printf("************************************************************\n");
      auto id = pair.first;
 
      auto new_id(id);
