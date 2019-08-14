@@ -504,8 +504,8 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
 
+     // find partons - quarks (d, y, s, c, b) or gluon from the gen particles. From QCD or LLP decay. top quark is unstable and heavier
      if ( (abs(pdgId)>=1 && abs(pdgId)<=5) || abs(pdgId)==21) {
-       //     if ( (abs(pdgId)==5) )  { // check specifically for the b quark from the LLP decay
        partons.push_back(p4);
      }
      /*
@@ -514,7 +514,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
        num_b ++;
      } 
      */
-
    }
 
    sort(partons.begin(), partons.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
@@ -526,14 +525,12 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      gen_b_phi_[i]=partons[i].phi();
    }
 
-
    //   edm::ESHandle<CaloGeometry> gen_geo;
    setup.get<CaloGeometryRecord>().get(gen_geo_);
 
    edm::ESHandle<HcalChannelQuality> h_status;
    // setup.get<HcalChannelQualityRcd>().get(h_status);
    // const HcalChannelQuality *status = h_status.product();
-
    // edm::ESHandle<HcalSeverityLevelComputer> h_comp;
    // setup.get<HcalSeverityLevelComputerRcd>().get(h_comp);
    // const HcalSeverityLevelComputer *comp = h_comp.product();
@@ -578,14 +575,13 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      }
    }
 
+   ESHandle<CaloTPGTranscoder> decoder;
+   setup.get<CaloTPGRecord>().get(decoder);
+
    // ESHandle<L1CaloHcalScale> hcal_scale;
    // setup.get<L1CaloHcalScaleRcd>().get(hcal_scale);
    // const L1CaloHcalScale* h = hcal_scale.product();
-
-   ESHandle<CaloTPGTranscoder> decoder;
-   setup.get<CaloTPGRecord>().get(decoder);
-   //   decoder->setup(setup, CaloTPGTranscoder::HcalTPG);
-
+   // decoder->setup(setup, CaloTPGTranscoder::HcalTPG);
    // edm::ESHandle<L1RCTParameters> rct;
    // setup.get<L1RCTParametersRcd>().get(rct);
    // const L1RCTParameters* r = rct.product();
@@ -596,7 +592,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       id = HcalTrigTowerDetId(id.ieta(), id.iphi(), 1, id.version());
 
       // Temporary remove HCAL TPs in HF
-      if (abs(id.ieta()) > 28) continue;
+      //if (abs(id.ieta()) > 28) continue;
 
       ev_tp_energy_ += decoder->hcaletValue(id,digi.SOI_compressedEt());  
       tpdigis[id].push_back(digi);
@@ -610,12 +606,13 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
       memset(tp_energy_depth_, 0, sizeof(tp_energy_depth_));
       memset(tp_ts_adc_, 0, sizeof(tp_ts_adc_));                 
-      //      memset(tp_pulse_shape_, 0, sizeof(tp_pulse_shape_));
 
       int et_max = 0;
       int et_sum = 0;
 
-      //      if(tp_energy_<=0.5) continue; 
+      std::cout << "TP energy: " << tp_energy_ << std::endl;
+
+      if(tp_energy_<=0.5) continue; 
 
       // getting the energy depth information filled
       std::vector<int> energy_depth = digi.getDepthData();
@@ -636,17 +633,10 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
       // getting the pulse shape information filled
       std::vector<int> ts_adc = digi.getSampleData();        
-      //      std::vector<int> pulse_shape = digi.getSampleData();
       for (int i = 0; i < static_cast<int>(ts_adc.size()); i++) {          
 	tp_ts_adc_[i] = ts_adc[i];           
       }
 
-      /*
-      for (int i = 0; i < static_cast<int>(pulse_shape.size()); ++i) {
-	//int shape = pulse_shape[i];
-	tp_pulse_shape_[i] += pulse_shape[i];
-      }
-      */
       double sum = 0;
       std::for_each(tp_energy_depth_, tp_energy_depth_ + 8, [&](double &i){ sum += i; });
       std::for_each(tp_energy_depth_, tp_energy_depth_ + 8, [=](double &i){ 
@@ -655,10 +645,8 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	});
 
       tp_soi_ = digi.SOI_compressedEt();
-      //      tps_->Fill();
       
       //      HcalDetId hcaldetid(id);
-
       //      auto thisCell = gen_geo_->getGeometry(id);
 
       // Convert TP detector ieta,iphi to physical eta,phi coordinates
@@ -809,14 +797,16 @@ const reco::Candidate* HcalCompareUpgradeChains::findFirstMotherWithDifferentID(
 }
 
 double HcalCompareUpgradeChains::deltaPhi(double phi1, double phi2) {
-
+  // Delta phi calculation, using 0 to 2pi
   if (phi1<0) phi1+=2.*TMath::Pi();
   if (phi2<0) phi2+=2.*TMath::Pi();
-
   double result = phi1 - phi2;
-  if(fabs(result) > 9999) return result;
-  while (result > TMath::Pi()) result -= 2*TMath::Pi();
-  while (result <= -TMath::Pi()) result += 2*TMath::Pi();
+  if(fabs(result) > 9999) 
+    return result;
+  while (result > TMath::Pi())
+    result -= 2*TMath::Pi();
+  while (result <= -TMath::Pi()) 
+    result += 2*TMath::Pi();
   return result;
 }
 
