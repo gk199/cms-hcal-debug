@@ -104,7 +104,6 @@
 
 typedef ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> > LorentzVector;
 // class declaration
-//
 
 class HcalCompareUpgradeChains : public edm::EDAnalyzer {
    public:
@@ -311,7 +310,6 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatch3_->Branch("gen_b_eta",gen_b_eta_, "gen_b_eta_[4]/D");
    tpsmatch3_->Branch("gen_b_phi",gen_b_phi_, "gen_b_phi_[4]/D");
 
-
    tpsplit_ = fs->make<TTree>("tpsplit", "Trigger primitives");
    tpsplit_->Branch("et", &tpsplit_energy_);
    tpsplit_->Branch("oot", &tpsplit_oot_);
@@ -449,7 +447,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      /* return; */
    }
 
-
   // get vertices
    /*
   if (doReco_) {
@@ -489,7 +486,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
     if (mom){
       momId = mom->pdgId();
     }
-     
      int pdgId = abs(it.pdgId());
      int status = it.status();
      //    float px = it.px();
@@ -500,6 +496,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      float phi = it.phi();
      float mass = it.mass();
      */
+     
      int pdgId = abs(it.pdgId());      
 
      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
@@ -565,7 +562,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	 continue;
        ev_rh_energy0_ += hit.energy() / get_cosh(id);
        ev_rh_energy_ += hit.energy() / get_cosh(id);
-       // ev_rh_energy3_ += hit.energy() / get_cosh(id);
 
        auto tower_ids = tpd_geo.towerIds(id);
        for (auto& tower_id: tower_ids) {
@@ -610,7 +606,9 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       int et_max = 0;
       int et_sum = 0;
 
-      std::cout << "TP energy: " << tp_energy_ << std::endl;
+      //printf("  \n");
+      //printf("  \n");
+      //printf("TP energy: %f ", tp_energy_);
 
       if(tp_energy_<=0.5) continue; 
 
@@ -653,27 +651,32 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       double tp_eta_=etaVal(tp_ieta_); //(double)thisCell->etaPos();
       double tp_phi_=phiVal(tp_iphi_); // (double)thisCell->phiPos();
 
-      printf("TP detector (digi loop) ieta= %d , iphi= %d and physical eta= %f, phi= %f\n",tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
+      //printf("TP detector (digi loop) with energy = %f , ieta= %d , iphi= %d and physical eta= %f, phi= %f\n",tp_energy_,tp_ieta_,tp_iphi_,tp_eta_,tp_phi_);
 
       // Fill the reduced tps_ tree: tpsmatch_ this is only filled for gen matched particles
       float dRmin = 999.;
 
       for (auto & it : partons) {
-	printf("in partons loop with pt = %f and eta = %f \n",it.pt(), it.eta());
+	//printf("in partons loop with pt = %f and eta = %f \n",it.pt(), it.eta());
 
 	// discard b-quarks (and other quarks and gluons) outside the detector acceptance
 	if(it.pt()<20.)continue;
 	if(fabs(it.eta())>2.5) continue;
+	// add a eta cut on the TP such that TPs in HF are not attempted to be matched to gen particles in HBHE
+	if(fabs(tp_ieta_)>28.)continue;
 
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi());
+	if (dR<dRmin) dRmin=dR;
      
+	/*
+	printf("Passed detector cuts on gen particle");
 	printf("Delta R checking: Gen pt= %f, eta= %f, phi= %f. TP eta = %f, phi= %f. DeltaR: dR= %f, min_dR= %f\n", it.pt(), it.eta(), it.phi(), tp_eta_, tp_phi_, dR, dRmin);
 	printf("eta diff = %f, phi diff = %f\n", tp_eta_-it.eta(), tp_phi_-it.phi());
 	printf("deltaPhi = %f\n", deltaPhi(tp_phi_, it.phi())); 
 	printf("deltaPhi = %f\n", deltaPhi(it.phi(), tp_phi_));
 	printf("DeltaR cross check calculation = %f\n", sqrt((tp_eta_-it.eta())*(tp_eta_-it.eta())+(deltaPhi(tp_phi_, it.phi()))*(deltaPhi(tp_phi_, it.phi()))));
-  
-	if (dR<dRmin) dRmin=dR;
+	*/
+
       }
 
       // add the min delta R value to the tps tree to check for a reasonable deltaR cut
