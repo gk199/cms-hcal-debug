@@ -663,7 +663,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	if(it.pt()<20.)continue;
 	if(fabs(it.eta())>2.5) continue;
 	// add a eta cut on the TP such that TPs in HF are not attempted to be matched to gen particles in HBHE
-	if(fabs(tp_ieta_)>28.)continue;
+	if(fabs(tp_ieta_)>29.)continue;
 
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi());
 	if (dR<dRmin) dRmin=dR;
