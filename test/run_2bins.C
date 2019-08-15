@@ -76,6 +76,7 @@ int main(int argc, char* argv[])
   int     depth_end = 0;
   int     soi = 0;
   double  TP_energy_depth[8] = {0};
+  double  min_deltaR = 0;
 
   // SetBranchAddress for the varaibles accessed from the input file
   tchain->SetBranchAddress("et", &et);
@@ -86,12 +87,17 @@ int main(int argc, char* argv[])
   tchain->SetBranchAddress("depth_end", &depth_end);
   tchain->SetBranchAddress("soi", &soi);
   tchain->SetBranchAddress("TP_energy_depth", TP_energy_depth);
+  tchain->SetBranchAddress("min_deltaR", &min_deltaR);
 
   // setup necessary histograms for HCAL Barrel region
   // have histograms for inclusive (all ieta regions), and for each ieta region binned by energy ranges
   TH2F* frac_depth_inc_HB = new TH2F("Energy_Depth_HB", "TP Energy Fraction vs Depth in HB", 8, -0.5, 7.5, 60, 0, 1.2);
   TH2F* frac_depth_inc_HB_0510 = new TH2F("Energy_Depth_HB_0510", "TP Energy Fraction vs Depth in HB 0.5-10 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
   TH2F* frac_depth_inc_HB_10 = new TH2F("Energy_Depth_HB_10", "TP Energy Fraction vs Depth in HB 10+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+
+  TH1F* min_deltaR_low = new TH1F("min_deltaR_low", "Min DeltaR, 0.5 - 10 GeV", 100, 0, 0.5);
+  TH1F* min_deltaR_high = new TH1F("min_deltaR_high", "Min DeltaR, 10 + GeV", 100, 0, 0.5);
+  
   std::map<int, TH2F*> frac_depth_exl_HB_1; // 0.5<et<=10
   std::map<int, TH2F*> frac_depth_exl_HB_2; // 10<et
 
@@ -147,11 +153,13 @@ int main(int argc, char* argv[])
                 {
 		  frac_depth_exl_HB_1[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
 		  frac_depth_inc_HB_0510->Fill(i,TP_energy_depth[i]/et);
+		  min_deltaR_low->Fill(min_deltaR);
                 }
               else if (et > 10 )
                 {
                   frac_depth_exl_HB_2[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
                   frac_depth_inc_HB_10->Fill(i,TP_energy_depth[i]/et);
+		  min_deltaR_high->Fill(min_deltaR);
 		}
 	    }
 
@@ -167,11 +175,13 @@ int main(int argc, char* argv[])
 		{
                  frac_depth_exl_HE_1[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
 		 frac_depth_inc_HE_0510->Fill(i,TP_energy_depth[i]/et);
+		 min_deltaR_low->Fill(min_deltaR);
 		}
 	      else if (et > 10 ) 
 		{
 		  frac_depth_exl_HE_2[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
 		  frac_depth_inc_HE_10->Fill(i,TP_energy_depth[i]/et);
+		  min_deltaR_high->Fill(min_deltaR);
 		}
 	    }
 	}
@@ -182,6 +192,8 @@ int main(int argc, char* argv[])
   frac_depth_inc_HE->Write();
   frac_depth_inc_HE_0510->Write();
   frac_depth_inc_HE_10->Write();
+  min_deltaR_low->Write();
+  min_deltaR_high->Write();
 
   tp_depth_eta_HE->Write();
   for(int eta=0;eta<_length_ietaHE;eta++)
