@@ -526,8 +526,8 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
        partons.push_back(p4);
        std::cout << "pdg ID: " << it.pdgId() << std::endl;
        std::cout << "particle vertex: " << it.vertex() << std::endl;
-       std::cout << "r position: " << it.vertex().R() << std::endl;
-       std::cout << "x, y, z position: " << it.vertex().X() << it.vertex().Y() << it.vertex().Z() << std::endl;
+       //std::cout << "r position: " << it.vertex().R() << std::endl;
+       //std::cout << "x, y, z position: " << it.vertex().X() << it.vertex().Y() << it.vertex().Z() << std::endl;
        // HE region 3.88 - 5.68 m and out to 2.95 m radius
        // HB region z below 3.88m, radius 1.79 - 2.95m
        double radius = 0.;
@@ -554,13 +554,17 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      gen_b_phi_[i]=partons[i].phi();
    }
 
-   sort(partonsHCAL.begin(), partonsHCAL.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
-   // Fill the GEN branches in tpsmatchHCAL tree
-   for(int i=0;i<4;i++){
-     gen_b_HCAL_pt_[i]=partonsHCAL[i].pt();
-     gen_b_HCAL_eta_[i]=partonsHCAL[i].eta();
-     gen_b_HCAL_phi_[i]=partonsHCAL[i].phi();
+   // sort partonsHCAL, but check that it is not empty first
+   if( ! partonsHCAL.empty() ) {
+     sort(partonsHCAL.begin(), partonsHCAL.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
+     // Fill the GEN branches in tpsmatchHCAL tree
+     for(int i=0;i<4;i++){
+       gen_b_HCAL_pt_[i]=partonsHCAL[i].pt();
+       gen_b_HCAL_eta_[i]=partonsHCAL[i].eta();
+       gen_b_HCAL_phi_[i]=partonsHCAL[i].phi();
+     }
    }
+
 
    //   edm::ESHandle<CaloGeometry> gen_geo;
    setup.get<CaloGeometryRecord>().get(gen_geo_);
