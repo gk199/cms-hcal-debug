@@ -43,7 +43,8 @@ int main(int argc, char* argv[])
 
   // which tree to look at from the input file, here only looking at Trigger Primatives (TPs)
   //treeList = "compareReemulRecoSeverity9/tps";
-  treeList = "compareReemulRecoSeverity9/tps_match";
+  //treeList = "compareReemulRecoSeverity9/tps_match";
+  treeList = "compareReemulRecoSeverity9/tps_matchHCAL";
   //treeList = "compareReemulRecoSeverity9/tps_match1";
   //treeList = "compareReemulRecoSeverity9/tps_match2";
   //treeList = "compareReemulRecoSeverity9/tps_match3";
@@ -77,6 +78,7 @@ int main(int argc, char* argv[])
   int     soi = 0;
   double  TP_energy_depth[8] = {0};
   double  min_deltaR = 0;
+  double  min_deltaR_HCAL = 0;
 
   // SetBranchAddress for the varaibles accessed from the input file
   tchain->SetBranchAddress("et", &et);
@@ -87,7 +89,9 @@ int main(int argc, char* argv[])
   tchain->SetBranchAddress("depth_end", &depth_end);
   tchain->SetBranchAddress("soi", &soi);
   tchain->SetBranchAddress("TP_energy_depth", TP_energy_depth);
-  tchain->SetBranchAddress("min_deltaR", &min_deltaR);
+  //  tchain->SetBranchAddress("min_deltaR", &min_deltaR);
+  // this is for if using tree tps_matchHCAL where only events where the LLP decays in the HCAL are saved. Then comment out min_deltaR above.
+  tchain->SetBranchAddress("min_deltaR_HCAL", &min_deltaR_HCAL);
 
   // setup necessary histograms for HCAL Barrel region
   // have histograms for inclusive (all ieta regions), and for each ieta region binned by energy ranges
@@ -153,13 +157,13 @@ int main(int argc, char* argv[])
                 {
 		  frac_depth_exl_HB_1[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
 		  frac_depth_inc_HB_0510->Fill(i,TP_energy_depth[i]/et);
-		  min_deltaR_low->Fill(min_deltaR);
+		  min_deltaR_low->Fill(min_deltaR_HCAL);
                 }
               else if (et > 10 )
                 {
                   frac_depth_exl_HB_2[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
                   frac_depth_inc_HB_10->Fill(i,TP_energy_depth[i]/et);
-		  min_deltaR_high->Fill(min_deltaR);
+		  min_deltaR_high->Fill(min_deltaR_HCAL);
 		}
 	    }
 
@@ -175,13 +179,13 @@ int main(int argc, char* argv[])
 		{
                  frac_depth_exl_HE_1[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
 		 frac_depth_inc_HE_0510->Fill(i,TP_energy_depth[i]/et);
-		 min_deltaR_low->Fill(min_deltaR);
+		 min_deltaR_low->Fill(min_deltaR_HCAL);
 		}
 	      else if (et > 10 ) 
 		{
 		  frac_depth_exl_HE_2[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
 		  frac_depth_inc_HE_10->Fill(i,TP_energy_depth[i]/et);
-		  min_deltaR_high->Fill(min_deltaR);
+		  min_deltaR_high->Fill(min_deltaR_HCAL);
 		}
 	    }
 	}
