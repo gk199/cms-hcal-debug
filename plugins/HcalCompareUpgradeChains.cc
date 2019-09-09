@@ -171,6 +171,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
       int tp_soi_;
       int tp_ts_adc_[8] = {0};          
       double min_deltaR_;
+      double min_deltaR_HCAL_;
 
       double tpsplit_energy_;  
       double tpsplit_oot_;
@@ -264,7 +265,7 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatchHCAL_->Branch("TP_energy_depth", tp_energy_depth_, "TP_energy_depth[8]/D");
    tpsmatchHCAL_->Branch("event", &event_);
    tpsmatchHCAL_->Branch("ts_adc", tp_ts_adc_, "ts_adc[8]/I");
-   tpsmatchHCAL_->Branch("min_deltaR", &min_deltaR_);
+   tpsmatchHCAL_->Branch("min_deltaR_HCAL", &min_deltaR_HCAL_);
    // these are the gen particle branches in the tpsmatch tree, and are filled in order of b quark pt
    tpsmatchHCAL_->Branch("gen_b_HCAL_pt",gen_b_HCAL_pt_, "gen_b_HCAL_pt_[4]/D");
    tpsmatchHCAL_->Branch("gen_b_HCAL_eta",gen_b_HCAL_eta_, "gen_b_HCAL_eta_[4]/D");
@@ -481,7 +482,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
   }
    */
 
-
    //gen particles
    Handle<edm::View<reco::GenParticle> > genParticles;
    event.getByToken(GenTag_, genParticles);
@@ -516,25 +516,26 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      
      int pdgId = abs(it.pdgId());
 
-     std::cout << "pdg ID: " << it.pdgId() << std::endl;
-     std::cout << "particle vertex: " << it.vertex() << std::endl;
+     //std::cout << "pdg ID: " << it.pdgId() << std::endl;
+     //std::cout << "particle vertex: " << it.vertex() << std::endl;
 
      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
 
      // find partons - quarks (d, y, s, c, b) or gluon from the gen particles. From QCD or LLP decay. top quark is unstable and heavier
      if ( (abs(pdgId)>=1 && abs(pdgId)<=5) || abs(pdgId)==21) {
        partons.push_back(p4);
-       std::cout << "pdg ID: " << it.pdgId() << std::endl;
-       std::cout << "particle vertex: " << it.vertex() << std::endl;
+       //std::cout << "pdg ID: " << it.pdgId() << std::endl;
+       //std::cout << "particle vertex: " << it.vertex() << std::endl;
        //std::cout << "r position: " << it.vertex().R() << std::endl;
        //std::cout << "x, y, z position: " << it.vertex().X() << it.vertex().Y() << it.vertex().Z() << std::endl;
+       // check that the LLP decays in the HCAL by requiring quark gen vertex to be in the HCAL volume, and then save these events to the Lorentz vector partonsHCAL
        // HE region 3.88 - 5.68 m and out to 2.95 m radius
        // HB region z below 3.88m, radius 1.79 - 2.95m
        double radius = 0.;
        radius = sqrt(it.vertex().X()*it.vertex().X()+it.vertex().Y()*it.vertex().Y());
        if ( abs(it.vertex().Z()) < 5.68 && radius < 2.95 && ( abs(it.vertex().Z()) > 3.88 || radius > 1.79 ) ) {
 	 partonsHCAL.push_back(p4);
-	 std::cout << "radius: " << radius << std::endl;
+	 //std::cout << "radius: " << radius << std::endl;
        }
      }
      /*
@@ -554,7 +555,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      gen_b_phi_[i]=partons[i].phi();
    }
 
-   // sort partonsHCAL, but check that it is not empty first
+   // sort partonsHCAL, but check that it is not empty first as not every event has the LLP decaying within HCAL volume
    if( ! partonsHCAL.empty() ) {
      sort(partonsHCAL.begin(), partonsHCAL.end(), ptsort()); // want to sort b-jets by pt, this is what will make TPs
      // Fill the GEN branches in tpsmatchHCAL tree
@@ -702,7 +703,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
       for (auto & it : partons) {
 	//printf("in partons loop with pt = %f and eta = %f \n",it.pt(), it.eta());
-
 	// discard b-quarks (and other quarks and gluons) outside the detector acceptance
 	if(it.pt()<20.)continue;
 	if(fabs(it.eta())>2.5) continue;
@@ -711,7 +711,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi());
 	if (dR<dRmin) dRmin=dR;
-     
 	/*
 	printf("Passed detector cuts on gen particle");
 	printf("Delta R checking: Gen pt= %f, eta= %f, phi= %f. TP eta = %f, phi= %f. DeltaR: dR= %f, min_dR= %f\n", it.pt(), it.eta(), it.phi(), tp_eta_, tp_phi_, dR, dRmin);
@@ -720,7 +719,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	printf("deltaPhi = %f\n", deltaPhi(it.phi(), tp_phi_));
 	printf("DeltaR cross check calculation = %f\n", sqrt((tp_eta_-it.eta())*(tp_eta_-it.eta())+(deltaPhi(tp_phi_, it.phi()))*(deltaPhi(tp_phi_, it.phi()))));
 	*/
-
       }
 
       // add the min delta R value to the tps tree to check for a reasonable deltaR cut
@@ -741,8 +739,8 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi());
 	if (dR<dRminHCAL) dRminHCAL=dR;
       }
-      min_deltaR_ = dRminHCAL;
-      if(dRmin<0.5) {tpsmatchHCAL_->Fill(); }
+      min_deltaR_HCAL_ = dRminHCAL;
+      if(dRminHCAL<0.5) {tpsmatchHCAL_->Fill(); }
 
       if (et_sum > 0) {
 	  for (int i = 0; i < static_cast<int>(energy_depth.size()); ++i) {
