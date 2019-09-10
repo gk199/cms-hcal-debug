@@ -121,7 +121,7 @@ int main(int argc, char* argv[])
   TH2F* frac_depth_inc_HE_5 = new TH2F("Energy_Depth_HE_5", "TP Energy Fraction vs Depth in HE 5+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
 
   TH2F* frac_depth_inc_17_21_HE = new TH2F("Energy_Depth_17_21_HE", "TP Energy Fraction vs Depth in HE, ieta 17-21", 8, -0.5, 7.5, 60, 0, 1.2);
-  TH2F* frac_depth_inc_17_21_HE_055 = new TH2F("Energy_Depth_HE_17_21_055", "TP Energy Fraction vs Depth in HE, ieta 17-21, 0.5-5 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_17_21_HE_055 = new TH2F("Energy_Depth_17_21_HE_055", "TP Energy Fraction vs Depth in HE, ieta 17-21, 0.5-5 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
   TH2F* frac_depth_inc_17_21_HE_5 = new TH2F("Energy_Depth_17_21_HE_5", "TP Energy Fraction vs Depth in HE, ieta 17-21, 5+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
 
   TH2F* frac_depth_inc_22_28_HE = new TH2F("Energy_Depth_22_28_HE", "TP Energy Fraction vs Depth in HE, ieta 22-28", 8, -0.5, 7.5, 60, 0, 1.2);
@@ -130,7 +130,6 @@ int main(int argc, char* argv[])
 
   std::map<int, TH2F*> frac_depth_exl_HE_1; // 0.5<et<=5  
   std::map<int, TH2F*> frac_depth_exl_HE_2; // 5<et        
-
 
 
   for(int eta=0;eta<_length_ietaHE;eta++)
@@ -232,7 +231,6 @@ int main(int argc, char* argv[])
 		      frac_depth_inc_22_28_HE_5->Fill(i, TP_energy_depth[i]/et);
 		    }
 		}
-
 	    }
 	}
     }
