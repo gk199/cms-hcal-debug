@@ -96,38 +96,51 @@ int main(int argc, char* argv[])
   // setup necessary histograms for HCAL Barrel region
   // have histograms for inclusive (all ieta regions), and for each ieta region binned by energy ranges
   TH2F* frac_depth_inc_HB = new TH2F("Energy_Depth_HB", "TP Energy Fraction vs Depth in HB", 8, -0.5, 7.5, 60, 0, 1.2);
-  TH2F* frac_depth_inc_HB_0510 = new TH2F("Energy_Depth_HB_0510", "TP Energy Fraction vs Depth in HB 0.5-10 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
-  TH2F* frac_depth_inc_HB_10 = new TH2F("Energy_Depth_HB_10", "TP Energy Fraction vs Depth in HB 10+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_HB_055 = new TH2F("Energy_Depth_HB_055", "TP Energy Fraction vs Depth in HB 0.5-5 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_HB_5 = new TH2F("Energy_Depth_HB_5", "TP Energy Fraction vs Depth in HB 5+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
 
-  TH1F* min_deltaR_low = new TH1F("min_deltaR_low", "Min DeltaR, 0.5 - 10 GeV", 100, 0, 0.5);
-  TH1F* min_deltaR_high = new TH1F("min_deltaR_high", "Min DeltaR, 10 + GeV", 100, 0, 0.5);
+  TH1F* min_deltaR_low = new TH1F("min_deltaR_low", "Min DeltaR, 0.5 - 5 GeV", 100, 0, 0.5);
+  TH1F* min_deltaR_high = new TH1F("min_deltaR_high", "Min DeltaR, 5 + GeV", 100, 0, 0.5);
   
-  std::map<int, TH2F*> frac_depth_exl_HB_1; // 0.5<et<=10
-  std::map<int, TH2F*> frac_depth_exl_HB_2; // 10<et
+  std::map<int, TH2F*> frac_depth_exl_HB_1; // 0.5<et<=5
+  std::map<int, TH2F*> frac_depth_exl_HB_2; // 5<et
 
   for(int eta=0;eta<_length_ietaHB;eta++)
   {
-    frac_depth_exl_HB_1[_ietaHB[eta]] = new TH2F(Form("Fraction_Depth_HB_Abs(eta)%d_1",_ietaHB[eta]), Form("TP Energy fraction HB vs Depth Abs(eta)%d 0.5<et<=10",_ietaHB[eta]),8,-0.5,7.5,60,0,1.2);
-    frac_depth_exl_HB_2[_ietaHB[eta]] = new TH2F(Form("Fraction_Depth_HB_Abs(eta)%d_2",_ietaHB[eta]), Form("TP Energy fraction HB vs Depth Abs(eta)%d 10<et",_ietaHB[eta]),8,-0.5,7.5,60,0,1.2);
+    frac_depth_exl_HB_1[_ietaHB[eta]] = new TH2F(Form("Fraction_Depth_HB_Abs(eta)%d_1",_ietaHB[eta]), Form("TP Energy fraction HB vs Depth Abs(eta)%d 0.5<et<=5",_ietaHB[eta]),8,-0.5,7.5,60,0,1.2);
+    frac_depth_exl_HB_2[_ietaHB[eta]] = new TH2F(Form("Fraction_Depth_HB_Abs(eta)%d_2",_ietaHB[eta]), Form("TP Energy fraction HB vs Depth Abs(eta)%d 5<et",_ietaHB[eta]),8,-0.5,7.5,60,0,1.2);
    }
   TH3F* tp_depth_eta_HB = new TH3F("tp_depth_eta_HB", "Energy distribution within TPs for HB", 16,14.5,30.5,7,0.5,7.5,2000,0,200);
 
 
   // setup necessary histograms for HCAL Endcap region
+  // these are both HE ieta inclusive, and broken up 17-21 ieta, 22-28 ieta as this is where tower size increases
   // have histograms for inclusive (all ieta regions), and for each ieta region binned by energy ranges 
   TH2F* frac_depth_inc_HE = new TH2F("Energy_Depth_HE", "TP Energy Fraction vs Depth in HE", 8, -0.5, 7.5, 60, 0, 1.2);
-  TH2F* frac_depth_inc_HE_0510 = new TH2F("Energy_Depth_HE_0510", "TP Energy Fraction vs Depth in HE 0.5-10 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
-  TH2F* frac_depth_inc_HE_10 = new TH2F("Energy_Depth_HE_10", "TP Energy Fraction vs Depth in HE 10+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
-  std::map<int, TH2F*> frac_depth_exl_HE_1; // 0.5<et<=10  
-  std::map<int, TH2F*> frac_depth_exl_HE_2; // 10<et        
+  TH2F* frac_depth_inc_HE_055 = new TH2F("Energy_Depth_HE_055", "TP Energy Fraction vs Depth in HE 0.5-5 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_HE_5 = new TH2F("Energy_Depth_HE_5", "TP Energy Fraction vs Depth in HE 5+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+
+  TH2F* frac_depth_inc_17_21_HE = new TH2F("Energy_Depth_17_21_HE", "TP Energy Fraction vs Depth in HE, ieta 17-21", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_17_21_HE_055 = new TH2F("Energy_Depth_HE_17_21_055", "TP Energy Fraction vs Depth in HE, ieta 17-21, 0.5-5 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_17_21_HE_5 = new TH2F("Energy_Depth_17_21_HE_5", "TP Energy Fraction vs Depth in HE, ieta 17-21, 5+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+
+  TH2F* frac_depth_inc_22_28_HE = new TH2F("Energy_Depth_22_28_HE", "TP Energy Fraction vs Depth in HE, ieta 22-28", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_22_28_HE_055 = new TH2F("Energy_Depth_22_28_HE_055", "TP Energy Fraction vs Depth in HE, ieta 22-28, 0.5-5 GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+  TH2F* frac_depth_inc_22_28_HE_5 = new TH2F("Energy_Depth_22_28_HE_5", "TP Energy Fraction vs Depth in HE, ieta 22-28, 5+ GeV", 8, -0.5, 7.5, 60, 0, 1.2);
+
+  std::map<int, TH2F*> frac_depth_exl_HE_1; // 0.5<et<=5  
+  std::map<int, TH2F*> frac_depth_exl_HE_2; // 5<et        
+
+
 
   for(int eta=0;eta<_length_ietaHE;eta++)
     {
-      frac_depth_exl_HE_1[_ietaHE[eta]] = new TH2F(Form("Fraction_Depth_HE_Abs(eta)%d_1",_ietaHE[eta]), Form("TP Energy fraction HE vs Depth Abs(eta)%d 0.5<et<=10",_ietaHE[eta]),8,-0.5,7.5,60,0,1.2);
-      frac_depth_exl_HE_2[_ietaHE[eta]] = new TH2F(Form("Fraction_Depth_HE_Abs(eta)%d_2",_ietaHE[eta]), Form("TP Energy fraction HE vs Depth Abs(eta)%d 10<et",_ietaHE[eta]),8,-0.5,7.5,60,0,1.2);
+      frac_depth_exl_HE_1[_ietaHE[eta]] = new TH2F(Form("Fraction_Depth_HE_Abs(eta)%d_1",_ietaHE[eta]), Form("TP Energy fraction HE vs Depth Abs(eta)%d 0.5<et<=5",_ietaHE[eta]),8,-0.5,7.5,60,0,1.2);
+      frac_depth_exl_HE_2[_ietaHE[eta]] = new TH2F(Form("Fraction_Depth_HE_Abs(eta)%d_2",_ietaHE[eta]), Form("TP Energy fraction HE vs Depth Abs(eta)%d 5<et",_ietaHE[eta]),8,-0.5,7.5,60,0,1.2);
     }
   TH3F* tp_depth_eta_HE = new TH3F("tp_depth_eta_HE", "Energy distribution within TPs for HE", 16,14.5,30.5,7,0.5,7.5,2000,0,200);
- 
+  TH3F* tp_depth_eta_17_21_HE = new TH3F("tp_depth_eta_17_21_HE", "Energy distribution within TPs for HE, ieta 17-21", 16,14.5,30.5,7,0.5,7.5,2000,0,200);
+  TH3F* tp_depth_eta_22_28_HE = new TH3F("tp_depth_eta_22_28_HE", "Energy distribution within TPs for HE, ieta 22-28", 16,14.5,30.5,7,0.5,7.5,2000,0,200);
 
   // going through each entry of the input ntuples file
   long int nentries = tchain->GetEntries();
@@ -153,16 +166,16 @@ int main(int argc, char* argv[])
               tp_depth_eta_HB->Fill(abs(ieta),i,TP_energy_depth[i]/et);
 
 	      // now fill in the individual ieta bins and inclusive histograms with energy binning                                                                                       
-              if (et <= 10 )
+              if (et <= 5 )
                 {
 		  frac_depth_exl_HB_1[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
-		  frac_depth_inc_HB_0510->Fill(i,TP_energy_depth[i]/et);
+		  frac_depth_inc_HB_055->Fill(i,TP_energy_depth[i]/et);
 		  min_deltaR_low->Fill(min_deltaR_HCAL);
                 }
-              else if (et > 10 )
+              else if (et > 5 )
                 {
                   frac_depth_exl_HB_2[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
-                  frac_depth_inc_HB_10->Fill(i,TP_energy_depth[i]/et);
+                  frac_depth_inc_HB_5->Fill(i,TP_energy_depth[i]/et);
 		  min_deltaR_high->Fill(min_deltaR_HCAL);
 		}
 	    }
@@ -175,18 +188,51 @@ int main(int argc, char* argv[])
 	      tp_depth_eta_HE->Fill(abs(ieta),i,TP_energy_depth[i]/et);
 	      
 	      // now fill in the individual ieta bins and inclusive histograms with energy binning
-	      if (et <= 10 )
+	      if (et <= 5 )
 		{
                  frac_depth_exl_HE_1[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
-		 frac_depth_inc_HE_0510->Fill(i,TP_energy_depth[i]/et);
+		 frac_depth_inc_HE_055->Fill(i,TP_energy_depth[i]/et);
 		 min_deltaR_low->Fill(min_deltaR_HCAL);
 		}
-	      else if (et > 10 ) 
+	      else if (et > 5 ) 
 		{
 		  frac_depth_exl_HE_2[abs(ieta)]->Fill(i, TP_energy_depth[i]/et);
-		  frac_depth_inc_HE_10->Fill(i,TP_energy_depth[i]/et);
+		  frac_depth_inc_HE_5->Fill(i,TP_energy_depth[i]/et);
 		  min_deltaR_high->Fill(min_deltaR_HCAL);
 		}
+
+	      // fill HE ieta 17-21 inclusive plots
+	      if (abs(ieta) < 22 ) 
+		{
+		  frac_depth_inc_17_21_HE->Fill(i, TP_energy_depth[i]/et);
+		  tp_depth_eta_17_21_HE->Fill(abs(ieta),i,TP_energy_depth[i]/et);
+		  // now also fill with energy binning
+		  if (et <= 5 )
+		    {
+		      frac_depth_inc_17_21_HE_055->Fill(i, TP_energy_depth[i]/et);
+		    }
+		  else if (et > 5 )
+		    {
+		      frac_depth_inc_17_21_HE_5->Fill(i, TP_energy_depth[i]/et);
+		    }
+		}
+
+	      // fill HE ieta 22-28 inclusive plots (this is after tower size increases, phi segmentation is now 10 degrees)
+	      else if (abs(ieta) >= 22 )
+		{
+		  frac_depth_inc_22_28_HE->Fill(i, TP_energy_depth[i]/et);
+                  tp_depth_eta_22_28_HE->Fill(abs(ieta),i,TP_energy_depth[i]/et);
+		  // now also fill with energy binning
+		  if (et <= 5 )
+		    {
+		      frac_depth_inc_22_28_HE_055->Fill(i, TP_energy_depth[i]/et);
+		    }
+		  else if (et > 5 )
+		    {
+		      frac_depth_inc_22_28_HE_5->Fill(i, TP_energy_depth[i]/et);
+		    }
+		}
+
 	    }
 	}
     }
@@ -194,22 +240,35 @@ int main(int argc, char* argv[])
 
   // save all the histograms, for Endcap and Barrel regions
   frac_depth_inc_HE->Write();
-  frac_depth_inc_HE_0510->Write();
-  frac_depth_inc_HE_10->Write();
+  frac_depth_inc_HE_055->Write();
+  frac_depth_inc_HE_5->Write();
+
+  frac_depth_inc_17_21_HE->Write();
+  frac_depth_inc_17_21_HE_055->Write();
+  frac_depth_inc_17_21_HE_5->Write();
+
+  frac_depth_inc_22_28_HE->Write();
+  frac_depth_inc_22_28_HE_055->Write();
+  frac_depth_inc_22_28_HE_5->Write();
+
   min_deltaR_low->Write();
   min_deltaR_high->Write();
 
   tp_depth_eta_HE->Write();
+  tp_depth_eta_17_21_HE->Write();
+  tp_depth_eta_22_28_HE->Write();
+
   for(int eta=0;eta<_length_ietaHE;eta++)
   {
     frac_depth_exl_HE_1[_ietaHE[eta]]->Write();
     frac_depth_exl_HE_2[_ietaHE[eta]]->Write();
   }
   frac_depth_inc_HB->Write();
-  frac_depth_inc_HB_0510->Write();
-  frac_depth_inc_HB_10->Write();
+  frac_depth_inc_HB_055->Write();
+  frac_depth_inc_HB_5->Write();
 
   tp_depth_eta_HB->Write();
+
   for(int eta=0;eta<_length_ietaHB;eta++)
     {
       frac_depth_exl_HB_1[_ietaHB[eta]]->Write();
