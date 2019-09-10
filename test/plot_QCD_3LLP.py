@@ -41,7 +41,7 @@ process = 0
 if len(sys.argv) > 1: process=sys.argv[1]
 start = time.clock()
 #_detector = {'hb':"(abs(ieta)<=16)" ,'he': "(abs(ieta)>=16 && abs(ieta)<=29)",'hf':"(abs(ieta)>29)"}
-#_constrain = [" && etsum > 0.5 && etsum <= 10"," && etsum > 10 && etsum <= 30"," && etsum > 30"]
+#_constrain = [" && etsum > 0.5 && etsum <= 5"," && etsum > 5 && etsum <= 30"," && etsum > 30"]
 
 # this is directory where the output plots will be stored
 folder = "./outPlots_fraction_QCD_LLP_overlay/"
@@ -64,10 +64,10 @@ path2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFr
 path3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl1000/"
 path4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/"
 mode = 1  # 1 means energy fraction versus depth, 2 means the RecHit/TP versus energy
-out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/QCD_2bins_10.root"
-out2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/LLP_mh2000_pl500_2bins_10.root"
-out3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl1000/LLP_mh2000_pl1000_2bins_10.root"
-out4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/LLP_mh2000_pl10000_2bins_10.root"
+out1 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/QCD/QCD_2bins_5_wHCALreq_ieta.root"
+out2 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl500/LLP_mh2000_pl500_2bins_5_wHCALreq_ieta.root"
+out3 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl1000/LLP_mh2000_pl1000_2bins_5_wHCALreq_ieta.root"
+out4 = "/eos/cms/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/HcalAnalysisFrameworkFiles/LLP_highstat/mh2000_mx975_pl10000/LLP_mh2000_pl10000_2bins_5_wHCALreq_ieta.root"
 # start defining functions
 def processData(path, out, mode):
   print('./run_2bins '+path+' '+out+' '+str(mode))
@@ -245,6 +245,7 @@ c.SaveAs(outfile + '[')
 
 Energy_Depth_n = "Energy_Depth_HE"
 Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
+# plot a single QCD inclusive sample
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, QCD")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
@@ -254,6 +255,7 @@ c.SaveAs(outpics)
 c.SaveAs(outfile)
 c.Update()
 
+# plot a single LLP sample
 c = r.TCanvas()
 Energy_Depth_t2_p.Draw("ehist")
 Energy_Depth_t2_p.SetTitle("HCAL Endcap, Inclusive, LLP ct=0.5 m")
@@ -263,6 +265,7 @@ outpics = folder + output + "2.eps"
 c.SaveAs(outpics)
 c.SaveAs(outfile)
 
+# plot all overlayed, QCD + 3 LLP samples
 c = r.TCanvas()
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
@@ -284,14 +287,15 @@ outpics = folder + output + "_com.eps"
 c.SaveAs(outpics)
 
 # adding for the inclusive regions, separated in energy bins
+# first do entirely HE inclusive, ieta 17 - 28
 c = r.TCanvas()
-Energy_Depth_n = "Energy_Depth_HE_0510"
+Energy_Depth_n = "Energy_Depth_HE_055"
 Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 0.5-10 GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 0.5-5 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -307,13 +311,13 @@ outpics = folder + output + "_com_lowET.eps"
 c.SaveAs(outpics)
 
 c = r.TCanvas()
-Energy_Depth_n = "Energy_Depth_HE_10"
+Energy_Depth_n = "Energy_Depth_HE_5"
 Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 10+ GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, Inclusive, TP ET 5+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -326,6 +330,90 @@ leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
 leg.Draw("same")
 c.SaveAs(outfile)
 outpics = folder + output + "_com_highET.eps"
+c.SaveAs(outpics)
+
+# HE ieta 17-21, split between energy binning of 0.5-5 GeV, 5+ GeV
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_17_21_HE_055"
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, ieta 17-21, Inclusive, TP ET 0.5-5 GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_17_21_lowET.eps"
+c.SaveAs(outpics)
+
+# HE ieta 17-21, energy binning 5+ GeV          
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_17_21_HE_5"
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, ieta 17-21, Inclusive, TP ET 5+ GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_17_21_highET.eps"
+c.SaveAs(outpics)
+
+# HE ieta 22-28, split between energy binning of 0.5-5 GeV, 5+ GeV                                                                                                            
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_22_28_HE_055"
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, ieta 22-28, Inclusive, TP ET 0.5-5 GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_22_28_lowET.eps"
+c.SaveAs(outpics)
+
+# HE ieta 17-21, energy binning of 5+ GeV                                                                                     
+c = r.TCanvas()
+Energy_Depth_n = "Energy_Depth_22_28_HE_5"
+Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
+Energy_Depth_t1_p.Draw("ehist")
+Energy_Depth_t2_p.Draw("ehistsame")
+Energy_Depth_t3_p.Draw("ehistsame")
+Energy_Depth_t4_p.Draw("ehistsame")
+Energy_Depth_t1_p.SetTitle("HCAL Endcap, ieta 22-28, Inclusive, TP ET 5+ GeV")
+Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
+Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
+leg = r.TLegend(0.75,0.75,0.95,0.85)
+leg.AddEntry(Energy_Depth_t1_p,"QCD MC")
+leg.AddEntry(Energy_Depth_t2_p,"LLP MC, ct=0.5 m")
+leg.AddEntry(Energy_Depth_t3_p,"LLP MC, ct=1 m")
+leg.AddEntry(Energy_Depth_t4_p,"LLP MC, ct=10 m")
+leg.Draw("same")
+c.SaveAs(outfile)
+outpics = folder + output + "_com_22_28_highET.eps"
 c.SaveAs(outpics)
 
 # *********************************************************
@@ -378,13 +466,13 @@ c.SaveAs(outpics)
 
 # adding for the inclusive regions, separated in energy bins                                                                          
 c = r.TCanvas()
-Energy_Depth_n = "Energy_Depth_HB_0510"
+Energy_Depth_n = "Energy_Depth_HB_055"
 Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 0.5-10 GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 0.5-5 GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
@@ -400,13 +488,13 @@ outpics = folder + output + "_com_lowET.eps"
 c.SaveAs(outpics)
 
 c = r.TCanvas()
-Energy_Depth_n = "Energy_Depth_HB_10"
+Energy_Depth_n = "Energy_Depth_HB_5"
 Energy_Depth_t1_p, Energy_Depth_t2_p, Energy_Depth_t3_p, Energy_Depth_t4_p = getHists(Energy_Depth_n, f1, f2, f3, f4, 0, 1)
 Energy_Depth_t1_p.Draw("ehist")
 Energy_Depth_t2_p.Draw("ehistsame")
 Energy_Depth_t3_p.Draw("ehistsame")
 Energy_Depth_t4_p.Draw("ehistsame")
-Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 10+ GeV")
+Energy_Depth_t1_p.SetTitle("HCAL Barrel, Inclusive, TP ET 5+ GeV")
 Energy_Depth_t1_p.GetXaxis().SetTitle("HCAL depth");
 Energy_Depth_t1_p.GetYaxis().SetTitle("TP energy fraction");
 Energy_Depth_t2_p.GetXaxis().SetTitle("HCAL depth");
