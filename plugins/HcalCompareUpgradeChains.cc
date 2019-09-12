@@ -118,6 +118,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
   double deltaR(double eta1, double phi1, double eta2, double phi2);
 
   double etaVal(int ieta); double phiVal(int iphi);
+  std::vector<double> intersect(double vx, double vy, double vz, double px, double py, double pz);
 
   struct ptsort: public std::binary_function<LorentzVector, LorentzVector, bool> 
   {
@@ -141,7 +142,6 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
   std::vector<edm::InputTag> rechits_;
 
   edm::ESHandle<CaloGeometry> gen_geo_; 
-
 
       TH2D *df_multiplicity_;
       TH2D *tp_multiplicity_;
@@ -204,11 +204,7 @@ class HcalCompareUpgradeChains : public edm::EDAnalyzer {
   bool swap_iphi_;
 
   int max_severity_;
-  /*
-  std::vector<edm::InputTag> vtxToken_;
-  unsigned int maxVtx_;
-  bool doReco_;
-  */
+
   const HcalChannelQuality* status_;
   const HcalSeverityLevelComputer* comp_;
 };
@@ -271,7 +267,7 @@ HcalCompareUpgradeChains::HcalCompareUpgradeChains(const edm::ParameterSet& conf
    tpsmatchHCAL_->Branch("gen_b_HCAL_eta",gen_b_HCAL_eta_, "gen_b_HCAL_eta_[4]/D");
    tpsmatchHCAL_->Branch("gen_b_HCAL_phi",gen_b_HCAL_phi_, "gen_b_HCAL_phi_[4]/D");
 
-   tpsmatch_ = fs->make<TTree>("tps_match", "Trigger primitives matched to GEN particles");
+   tpsmatch_ = fs->make<TTree>("tps_match", "Trigger primitives matched to GEN particles, DR 0.5");
    tpsmatch_->Branch("et", &tp_energy_);
    tpsmatch_->Branch("ieta", &tp_ieta_);
    tpsmatch_->Branch("iphi", &tp_iphi_);
@@ -485,10 +481,13 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
    //gen particles
    Handle<edm::View<reco::GenParticle> > genParticles;
    event.getByToken(GenTag_, genParticles);
-
    //   std::vector<LorentzVector > genbs; // b-quarks from LLP sample
    std::vector<LorentzVector > partons; // quarks of gluon in QCD sample --> more inclusive set of hadrons also containing LLP products
    std::vector<LorentzVector > partonsHCAL; // just the partons where the gen particles saved are quarks that decay in HCAL volume
+   std::vector<double > partonseta;
+   std::vector<double > partonsphi;
+   std::vector<double > partonsetaHCAL;
+   std::vector<double > partonsphiHCAL;
 
    //   int num_b = 0;
    int index = 0;
@@ -516,26 +515,48 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
      
      int pdgId = abs(it.pdgId());
 
-     //std::cout << "pdg ID: " << it.pdgId() << std::endl;
-     //std::cout << "particle vertex: " << it.vertex() << std::endl;
+     //     std::cout << "pdg ID: " << it.pdgId() << std::endl;
+     //     std::cout << "particle vertex: " << it.vertex() << std::endl;
 
      LorentzVector p4( it.px(), it.py(), it.pz(), it.energy() );
 
      // find partons - quarks (d, y, s, c, b) or gluon from the gen particles. From QCD or LLP decay. top quark is unstable and heavier
-     if ( (abs(pdgId)>=1 && abs(pdgId)<=5) || abs(pdgId)==21) {
+     // add detector cuts as well - done here before partons are saved to Lorentz vector (require high enough pt). Eta cut is also done
+     if ( (abs(pdgId)>=1 && abs(pdgId)<=5) || abs(pdgId)==21 ) {
        partons.push_back(p4);
        //std::cout << "pdg ID: " << it.pdgId() << std::endl;
        //std::cout << "particle vertex: " << it.vertex() << std::endl;
        //std::cout << "r position: " << it.vertex().R() << std::endl;
        //std::cout << "x, y, z position: " << it.vertex().X() << it.vertex().Y() << it.vertex().Z() << std::endl;
+       double px = it.px();
+       double py = it.py();
+       double pz = it.pz();
+       double vx = it.vertex().X();
+       double vy = it.vertex().Y();
+       double vz = it.vertex().Z();
+       //       std::cout << intersect(vx, vy, vz, px, py, pz)[0] << "  eta, phi of parton " << intersect(vx, vy, vz, px, py, pz)[1] << std::endl;
+       // now add detector cuts of pt and eta, before the partons eta and phi vectors are saved. These are vectors used for delta R matching
+       if (it.pt()>20. && fabs(intersect(vx, vy, vz, px, py, pz)[0])<2.5 )
+	 {
+	   partonseta.push_back(intersect(vx, vy, vz, px, py, pz)[0]);
+	   partonsphi.push_back(intersect(vx, vy, vz, px, py, pz)[1]);
+	 }
        // check that the LLP decays in the HCAL by requiring quark gen vertex to be in the HCAL volume, and then save these events to the Lorentz vector partonsHCAL
        // HE region 3.88 - 5.68 m and out to 2.95 m radius
        // HB region z below 3.88m, radius 1.79 - 2.95m
        double radius = 0.;
        radius = sqrt(it.vertex().X()*it.vertex().X()+it.vertex().Y()*it.vertex().Y());
-       if ( abs(it.vertex().Z()) < 5.68 && radius < 2.95 && ( abs(it.vertex().Z()) > 3.88 || radius > 1.79 ) ) {
+       // vertex x, y, z are in cm, radius is in cm, define the detector regions by cm as well. HCAL barrel 179-295 cm, HE 388-568
+       if ( abs(it.vertex().Z()) < 568 && radius < 295 && ( abs(it.vertex().Z()) > 388 || radius > 179 ) ) {
 	 partonsHCAL.push_back(p4);
-	 //std::cout << "radius: " << radius << std::endl;
+	 if (it.pt()>20. && fabs(intersect(vx, vy, vz, px, py, pz)[0])<2.5 )
+	   {
+	     partonsetaHCAL.push_back(intersect(vx, vy, vz, px, py, pz)[0]);
+	     partonsphiHCAL.push_back(intersect(vx, vy, vz, px, py, pz)[1]);
+	   }
+	 //	 std::cout << "radius: " << radius << std::endl;
+	 //	 std::cout << "particle partons vertex: " << it.vertex() << std::endl;
+	 //      std::cout << intersect(vx, vy, vz, px, py, pz)[0] << "  eta, phi of parton " << intersect(vx, vy, vz, px, py, pz)[1] << std::endl;
        }
      }
      /*
@@ -565,7 +586,6 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
        gen_b_HCAL_phi_[i]=partonsHCAL[i].phi();
      }
    }
-
 
    //   edm::ESHandle<CaloGeometry> gen_geo;
    setup.get<CaloGeometryRecord>().get(gen_geo_);
@@ -701,6 +721,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       // Fill the reduced tps_ tree: tpsmatch_ this is only filled for gen matched particles
       float dRmin = 999.;
 
+      /* dont need partons loop since only looping over already corrected eta and phi values, and already have detector cuts applied in the genParticles loop
       for (auto & it : partons) {
 	//printf("in partons loop with pt = %f and eta = %f \n",it.pt(), it.eta());
 	// discard b-quarks (and other quarks and gluons) outside the detector acceptance
@@ -711,15 +732,23 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi());
 	if (dR<dRmin) dRmin=dR;
-	/*
+
 	printf("Passed detector cuts on gen particle");
 	printf("Delta R checking: Gen pt= %f, eta= %f, phi= %f. TP eta = %f, phi= %f. DeltaR: dR= %f, min_dR= %f\n", it.pt(), it.eta(), it.phi(), tp_eta_, tp_phi_, dR, dRmin);
 	printf("eta diff = %f, phi diff = %f\n", tp_eta_-it.eta(), tp_phi_-it.phi());
 	printf("deltaPhi = %f\n", deltaPhi(tp_phi_, it.phi())); 
 	printf("deltaPhi = %f\n", deltaPhi(it.phi(), tp_phi_));
 	printf("DeltaR cross check calculation = %f\n", sqrt((tp_eta_-it.eta())*(tp_eta_-it.eta())+(deltaPhi(tp_phi_, it.phi()))*(deltaPhi(tp_phi_, it.phi()))));
-	*/
       }
+      */
+
+      // this loops over saved eta and phi values, which have already been corrected based on the non IP vertex. Already have detector cuts (pt > 20, eta < 2.5) applied
+      for (unsigned i = 0; i < partonseta.size(); i++ )
+	{
+	  if(fabs(tp_ieta_)>29.)continue;
+	  double dR = deltaR(tp_eta_,tp_phi_,partonseta[i],partonsphi[i]);
+	  if (dR<dRmin) dRmin=dR;
+	}
 
       // add the min delta R value to the tps tree to check for a reasonable deltaR cut
       min_deltaR_ = dRmin;
@@ -732,6 +761,7 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
       if(dRmin<0.5) {  tpsmatch_->Fill(); }
 
       float dRminHCAL = 999.;
+      /*
       for (auto & it : partonsHCAL) {
 	if(it.pt()<20.)continue;
 	if(fabs(it.eta())>2.5) continue;
@@ -739,6 +769,15 @@ HcalCompareUpgradeChains::analyze(const edm::Event& event, const edm::EventSetup
 	double dR = deltaR(tp_eta_,tp_phi_,it.eta(),it.phi());
 	if (dR<dRminHCAL) dRminHCAL=dR;
       }
+      */
+
+      // this loops over saved eta and phi values for any particle which decays in the HCAL, which have already been corrected based on the non IP vertex           
+      for (unsigned i = 0; i < partonsetaHCAL.size(); i++ )
+	{
+	  if(fabs(tp_ieta_)>29.)continue;
+	  double dR = deltaR(tp_eta_,tp_phi_,partonsetaHCAL[i], partonsphiHCAL[i]);
+	  if (dR<dRminHCAL) dRminHCAL=dR;
+	}
       min_deltaR_HCAL_ = dRminHCAL;
       if(dRminHCAL<0.5) {tpsmatchHCAL_->Fill(); }
 
@@ -915,6 +954,66 @@ double HcalCompareUpgradeChains::phiVal(int iphi) {
   return phivl;
 
 }
+
+// this is a correction function for the eta phi value of the intersection of a particle not resulting from the IP       
+// used since the b quark is matched to the TP based on eta phi, but the b quark results from a LLP decay so has a different vertex                
+// this code is based on Matthew Citron's https://gist.github.com/mcitron/62716c82674d9fe84e932ada2b2a59e5     
+std::vector<double> HcalCompareUpgradeChains::intersect(double vx, double vy,double vz, double px, double py, double pz) {
+  double lightSpeed = 29979245800;
+  double radius = 179; // 130 for calorimeters (ECAL + HCAL)
+  double length = 388; // 300 for calorimeters (ECAM + HCAL)
+  double energy = sqrt(px*px + py*py + pz*pz);
+  // First work out intersection with cylinder (barrel)        
+  double a = (px*px + py*py)*lightSpeed*lightSpeed/(energy*energy);
+  double b = 2*(vx*px + vy*py)*lightSpeed/energy;
+  double c = (vx*vx + vy*vy) - radius*radius;
+  double sqrt_disc = sqrt(b*b - 4*a*c);
+  double tCircle1 = (-b + sqrt_disc)/(2*a);
+  double tCircle2 = (-b - sqrt_disc)/(2*a);
+  // If intersection in the past it doesn't count         
+  if (tCircle1 < 0) tCircle1 = 1E9;
+  if (tCircle2 < 0) tCircle2 = 1E9;
+  // If the intsersection occurs outside the barrel length it doesn't count                       
+  double zPosCircle1 = tCircle1*(pz/energy)*lightSpeed + vz;
+  double zPosCircle2 = tCircle2*(pz/energy)*lightSpeed + vz;
+  if (zPosCircle1 > length) tCircle1 = 1E9;
+  if (zPosCircle2 > length) tCircle2 = 1E9;
+  // Now work out if it intersects the endcap                      
+  double tPlane1 = (length-vz)*energy/(pz*lightSpeed);
+  double tPlane2 = (-length-vz)*energy/(pz*lightSpeed);
+  // If intersection in the past it doesn't count                     
+  if (tPlane1 < 0) tPlane1 = 1E9;
+  if (tPlane2 < 0) tPlane2 = 1E9;
+  double xPosPlane1 = tPlane1*(px/energy)*lightSpeed + vx;
+  double yPosPlane1 = tPlane1*(py/energy)*lightSpeed + vy;
+  double xPosPlane2 = tPlane2*(px/energy)*lightSpeed + vx;
+  double yPosPlane2 = tPlane2*(py/energy)*lightSpeed + vy;
+  // If the intsersection occurs outside the endcap radius it doesn't count     
+  if (sqrt(xPosPlane1*xPosPlane1 + yPosPlane1*yPosPlane1) > radius) tPlane1 = 1E9;
+  if (sqrt(xPosPlane2*xPosPlane2+yPosPlane2*yPosPlane2) > radius) tPlane2 = 1E9;
+  // Find the first intersection                          
+  double tInter = std::min({tCircle1,tCircle2,tPlane1,tPlane2});
+  // Return 1000,1000 if not intersection with barrel or endcap             
+  std::vector<double> etaphi;
+  if (tInter > 1E6)
+    {
+      etaphi.push_back(1000);
+      etaphi.push_back(1000);
+      return etaphi;
+    }
+  // Find position of intersection                          
+  double xPos = tInter*(px/energy)*lightSpeed + vx;
+  double yPos = tInter*(py/energy)*lightSpeed + vy;
+  double zPos = tInter*(pz/energy)*lightSpeed + vz;
+  // Find eta/phi of intersection                          
+  double phi = atan2(yPos,xPos); // return the arc tan in radians                                                                                                                               
+  double theta = acos(zPos/sqrt(xPos*xPos + yPos*yPos + zPos*zPos));
+  double eta = -log(tan(theta/2.));
+  etaphi.push_back(eta);
+  etaphi.push_back(phi);
+  return etaphi;
+}
+
 
 void
 HcalCompareUpgradeChains::fillDescriptions(edm::ConfigurationDescriptions& descriptions) {
