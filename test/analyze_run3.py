@@ -19,12 +19,10 @@ process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cf
 process.load('Configuration.StandardSequences.RawToDigi_Data_cff')
 process.load('Configuration.StandardSequences.EndOfProcess_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
-
 process.load("SimCalorimetry.HcalTrigPrimProducers.hcaltpdigi_cff") 
 #process.load("EventFilter.HcalRawToDigi.HcalRawToDigi_cfi")
 process.load("RecoLocalCalo.Configuration.hcalLocalReco_cff") 
 process.load('CondCore.CondDB.CondDB_cfi')     
-
 
 process.maxEvents = cms.untracked.PSet(
     input = cms.untracked.int32(-1)
@@ -38,27 +36,31 @@ process.source = cms.Source("PoolSource",
 #        'root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/EB5DE19B-827A-C140-B813-1426AD296FCC.root',
 #        'root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/E3C5FF84-AD89-F743-BC1E-02E039B91EDF.root',
 #        'root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_6_0/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4-v1/10000/E0857173-72F5-6347-9B22-F8A42FB4321F.root'
+
 #        QCD Files, with pileup
+#        'file:/eos/user/g/gkopp/QCD_PU_DAS_MC/FD9083D9-8366-E74A-B617-AA81ECF03A85.root'
 #        'root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_6_0_pre4/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2021_realistic_v4-v1/20000/FD9083D9-8366-E74A-B617-AA81ECF03A85.root',
 #        'root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_6_0_pre4/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2021_realistic_v4-v1/20000/F1CEC1EF-5A92-5D4B-9CEA-3D46D6331910.root',
 #        'root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_6_0_pre4/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2021_realistic_v4-v1/20000/F0B17448-A584-0044-8610-239CC24272F1.root',
 #        'root://cms-xrd-global.cern.ch///store/relval/CMSSW_10_6_0_pre4/RelValQCD_FlatPt_15_3000HS_13/GEN-SIM-DIGI-RAW/PU25ns_106X_upgrade2021_realistic_v4-v1/20000/EE537805-F10F-5944-A962-5273523F0350.root'
+
 #        tt bar Files
 #        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/17BAFD99-C0D7-0848-BE74-C4B8E6CB00EE.root',
 #        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/F7BF498F-2FCA-BF42-A9E7-8A6C214B159C.root',
 #        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/BE268E78-7D2F-4D45-A040-36AE0D779BEB.root',
 #        '/store/relval/CMSSW_10_6_0/RelValTTbar_14TeV/GEN-SIM-DIGI-RAW/106X_upgrade2021_realistic_v4_rsb-v1/10000/4CD90995-B77D-374C-AB65-8878FDDCB361.root'
+
 #        LLP generated files
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_1.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_2.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_3.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_4.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_5.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_6.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_7.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_8.root',
-        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_9.root'
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_1.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_2.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_3.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_4.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_5.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_6.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_7.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_8.root',
+#        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_9.root'
 
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl1000_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root',
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl1000_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_1.root',
@@ -81,6 +83,7 @@ process.source = cms.Source("PoolSource",
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl10000_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_7.root',
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl10000_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_8.root',
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh2000_mx975_pl10000_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1_9.root'
+
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh125_mx50_pl10000_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root'
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh125_mx50_pl1000_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root'
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh125_mx50_pl500_ev1000/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root'
@@ -88,6 +91,112 @@ process.source = cms.Source("PoolSource",
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh125_mx50_pl500_ev2/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root',
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh125_mx50_pl10000_ev2/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root',
 #        '/store/group/dpg_hcal/comm_hcal/gillian/LLP_Run3/mh125_mx50_pl1000_ev2/ppTohToSS1SS2_SS1Tobb_SS2Toveve_1_withISR_step1.root',
+
+# Files from Matthew
+#125, 50, 3000mm
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_1.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_10.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_11.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_12.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_13.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_14.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_15.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_16.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_17.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_18.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_19.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_2.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_20.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_21.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_22.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_23.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_24.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_25.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_3.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_4.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_5.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_6.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_7.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_8.root',
+        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-50_CTau-3000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_9.root'
+#125, 25, 1500mm
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_1.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_10.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_11.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_12.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_13.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_14.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_15.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_16.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_17.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_18.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_19.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_2.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_20.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_21.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_22.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_23.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_24.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_25.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_3.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_4.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_5.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_6.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_7.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_8.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-25_CTau-1500mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_9.root'
+#125, 25, 900mm
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_1.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_10.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_11.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_12.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_13.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_14.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_15.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_16.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_17.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_18.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_19.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_2.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_20.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_21.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_22.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_23.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_24.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_25.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_3.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_4.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_5.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_6.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_7.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_8.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-125_MFF-12_CTau-900mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_9.root'
+#1000, 450, 1000mm
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_1.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_10.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_11.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_12.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_13.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_14.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_15.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_16.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_17.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_18.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_19.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_2.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_20.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_21.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_22.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_23.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_25.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_3.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_4.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_5.root',
+#        'root://cmsxrootd.fnal.gov/store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_6.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_7.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_8.root',
+#        'root://cmsxrootd.fnal.gov//store/user/mcitron/ProjectMetis/HTo2LongLivedTo4b_MH-1000_MFF-450_CTau-10000mm_privateMC_106X_PUMIX_v3_generation_forHCALRun3/output_9.root'
+
 #        Other files
 #        '/store/data/Run2018D/ZeroBias/RAW/v1/000/325/170/00000/FF9E45DF-DC15-E749-8E0C-0EE9A37361CD.root',
 #        '/store/data/Run2018D/ZeroBias/RAW/v1/000/325/170/00000/FCF7B55F-2E54-7B4C-852C-559C2729B181.root',
@@ -168,7 +277,7 @@ process = compare_reemul_reco_sev9(process)
 
 # Customisation from command line
 
-process.TFileService.fileName=cms.string('analyze_LLP_pl500.root')
+process.TFileService.fileName=cms.string('analyze_LLP_mh125_pl500.root')
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
