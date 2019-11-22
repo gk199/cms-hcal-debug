@@ -91,7 +91,7 @@ Local runs are based on `HcalTBSource` rather than `PoolSource` input and so can
     cd CMSSW_10_6_0/src 
     cmsenv 
     git cms-init 
-    git cms-merge-topic --unsafe georgia14:upgradeTPs-106X 
+    git cms-merge-topic --unsafe georgia14:upgradeHcalTPs-106X 
     git clone git@github.com:cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug 
 
 In python/customise.py, compare_tp_reco: replace 'HcalCompareLegacyChains' with 'HcalCompareUpgradeChains'. And in plugins/BuildFile.xml comment out line: 
