@@ -104,3 +104,17 @@ Then compile:
 
 See an example config file in test/analyze_325170.py (in 10_3_1) or analyze_run3.py (in 10_6_0)
 There exist now upgradeTPs-103X, upgradeTPs-104X, upgradeTPs-106X branches rebased in 103X, 104X, 106X respectively.  
+
+## Analyzing 2021 data
+
+    cmsrel CMSSW_11_2_0 
+    cd CMSSW_11_2_0/src 
+    cmsenv 
+    git clone https://github.com/cms-hcal-trigger/cms-hcal-debug.git Debug/HcalDebug
+    scram b
+    cd Debug/HcalDebug/test
+    
+### Analyzing one run (local)
+
+    ./one_run.py -r 342779 -t local
+    cmsRun analyze_2021_tp_data_342779.py

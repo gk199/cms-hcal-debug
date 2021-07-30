@@ -18,9 +18,9 @@ def main():
     """Generate configuration file given primary dataset,
     conditions, run period, and era."""
     primary_dataset = 'HcalNZS'
-    conditions = '100X_dataRun2_HLT_v3'
-    period = 'Commissioning2018'
-    era = 'Run2_2018'
+    conditions = '112X_dataRun3_HLT_v3'
+    period = 'Commissioning2021'
+    era = 'Run3'
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-r', "--run", required = True)
@@ -65,8 +65,8 @@ def main():
     # HcalTBSource cannot currently be specified in a cmsDriver.py command
     # so a special treatment is necessary
     else:
-        newfile = 'analyze_2018_tp_data_' + runnumber + '.py'
-        shutil.copy2('analyze_2018_tp_data_LOCALBASE.py', newfile)
+        newfile = 'analyze_2021_tp_data_' + runnumber + '.py'
+        shutil.copy2('analyze_2021_tp_data_LOCALBASE.py', newfile)
         os.system("sed -i 's/RUNNUMBER/" + runnumber + "/' " + newfile)
         os.system("sed -i 's/GLOBALTAG/" + conditions + "/' " + newfile)
                      
