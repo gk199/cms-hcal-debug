@@ -138,9 +138,41 @@ class AnalyzeTP : public edm::EDAnalyzer {
       int tp_depth_;
       int tp_version_;
       int tp_soi_;
+      TH1D *finegrain0_;
+      TH1D *finegrain1_;
+      TH1D *finegrain2_;
+      TH1D *finegrain3_;
+      TH1D *finegrain4_;
+      TH1D *finegrain5_;
+      TH1D *tp_fg_SOI_;
+      TH2D *finegrain_vs_event_;
+
       int tp_fg0_;
       int tp_fg1_;
+      int tp_fg2_;
+      int tp_fg3_;
+      int tp_fg4_;
+      int tp_fg5_;
+  /*
+      int tp_fg0_t1_;
+      int tp_fg1_t1_;
+      int tp_fg2_t1_;
+      int tp_fg3_t1_;
+      int tp_fg4_t1_;
+      int tp_fg5_t1_;
+      int tp_fg0_t2_;
+      int tp_fg1_t2_;
+      int tp_fg2_t2_;
+      int tp_fg3_t2_;
+      int tp_fg4_t2_;
+      int tp_fg5_t2_; */
       double tp_et_;
+      int HB_TDC_;
+      int HB_TDC_t1m_;
+      int HB_TDC_t2m_;
+      int HB_TDC_t1_;
+      int HB_TDC_t2_;
+      int HE_TDC_;
 
   //int ev_nvtx_;
   
@@ -177,6 +209,15 @@ AnalyzeTP::AnalyzeTP(const edm::ParameterSet& config):
    //
    if (doReco_) consumes<reco::VertexCollection>(vtxToken_[0]);
 
+   finegrain0_ = fs->make<TH1D>("finegrain0","Finegrain bit 0 in SOI",4,-1,3);
+   finegrain1_ = fs->make<TH1D>("finegrain1","Finegrain bit 1 in SOI",4,-1,3);
+   finegrain2_ = fs->make<TH1D>("finegrain2","Finegrain bit 2 in SOI",4,-1,3);
+   finegrain3_ = fs->make<TH1D>("finegrain3","Finegrain bit 3 in SOI",4,-1,3);
+   finegrain4_ = fs->make<TH1D>("finegrain4","Finegrain bit 4 in SOI",4,-1,3);
+   finegrain5_ = fs->make<TH1D>("finegrain5","Finegrain bit 5 in SOI",4,-1,3);
+   tp_fg_SOI_ = fs->make<TH1D>("tp_fg_SOI","Finegrain bit 0-5 in SOI",64,0,63);
+   finegrain_vs_event_ = fs->make<TH2D>("finegrain_vs_event","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
+
    saturation_ = fs->make<TH1D>("saturation", "", 42, 0.5, 42.5);
    delta_ = fs->make<TH1D>("delta", "", 42, 0.5, 42.5);
    lsb_ = fs->make<TH1D>("lsb", "", 42, 0.5, 42.5);
@@ -197,6 +238,29 @@ AnalyzeTP::AnalyzeTP(const edm::ParameterSet& config):
    tps_->Branch("et", &tp_et_);
    tps_->Branch("fg0", &tp_fg0_);
    tps_->Branch("fg1", &tp_fg1_);
+   tps_->Branch("fg2", &tp_fg2_);
+   tps_->Branch("fg3", &tp_fg3_);
+   tps_->Branch("fg4", &tp_fg4_);
+   tps_->Branch("fg5", &tp_fg5_);
+   /*   tps_->Branch("fg0_t1", &tp_fg0_t1_);
+   tps_->Branch("fg1_t1", &tp_fg1_t1_);
+   tps_->Branch("fg2_t1", &tp_fg2_t1_);
+   tps_->Branch("fg3_t1", &tp_fg3_t1_);
+   tps_->Branch("fg4_t1", &tp_fg4_t1_);
+   tps_->Branch("fg5_t1", &tp_fg5_t1_);
+   tps_->Branch("fg0_t2", &tp_fg0_t2_);
+   tps_->Branch("fg1_t2", &tp_fg1_t2_);
+   tps_->Branch("fg2_t2", &tp_fg2_t2_);
+   tps_->Branch("fg3_t2", &tp_fg3_t2_);
+   tps_->Branch("fg4_t2", &tp_fg4_t2_);
+   tps_->Branch("fg5_t2", &tp_fg5_t2_); */
+   tps_->Branch("packed_TDC", &HB_TDC_);
+   tps_->Branch("packed_TDC_t1m", &HB_TDC_t1m_);
+   tps_->Branch("packed_TDC_t2m", &HB_TDC_t2m_);
+   tps_->Branch("packed_TDC_t1", &HB_TDC_t1_);
+   tps_->Branch("packed_TDC_t2", &HB_TDC_t2_);
+   tps_->Branch("unpacked_TDC", &HE_TDC_);
+
  
    //   tps_->Branch("zerobiasTrigger", &zerobiasTrigger_);  
    // get vertices
@@ -345,8 +409,78 @@ AnalyzeTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       tp_version_ = id.version();
       tp_soi_ = digi.SOI_compressedEt();
       tp_et_ = decoder->hcaletValue(id, digi.t0());
-      tp_fg0_ = digi.t0().fineGrain(0);
-      tp_fg1_ = digi.t0().fineGrain(1);
+
+      if ( abs(id.ieta()) <= 15 ) {
+	//	saturation_->SetBinContent(i, decoder->hcaletValue(id, HcalTriggerPrimitiveSample(255, 0)));
+	finegrain0_->Fill(digi.t0().fineGrain(0));
+        finegrain1_->Fill(digi.t0().fineGrain(1));
+        finegrain2_->Fill(digi.t0().fineGrain(2));
+        finegrain3_->Fill(digi.t0().fineGrain(3));
+        finegrain4_->Fill(digi.t0().fineGrain(4));
+        finegrain5_->Fill(digi.t0().fineGrain(5));
+	tp_fg_SOI_->Fill(digi.t0().fineGrain(0) + (digi.t0().fineGrain(1) << 1) + (digi.t0().fineGrain(2) << 2) + (digi.t0().fineGrain(3) << 3) + (digi.t0().fineGrain(4) << 4) + (digi.t0().fineGrain(5) << 5));
+
+	//        finegrain_vs_event_->Fill(event.id().event(),digi.t0().fineGrain(1) * 1 + 6); // SOI
+	//        finegrain_vs_event_->Fill(event.id().event(),digi.t0().fineGrain(2) * 2 + 6);
+	//        finegrain_vs_event_->Fill(event.id().event(),digi.t0().fineGrain(3) * 3 + 6);
+	for (int SOI = 0; SOI < 5; SOI++) {
+	  // SOI = 2, already filled above. digi.presamples() = 2, and t0() returns sample(presamples)
+	  for (int fgbit = 1; fgbit < 4; fgbit++) {
+	    if (digi.sample(SOI).fineGrain(fgbit) == 1) finegrain_vs_event_->Fill(event.id().event(),digi.sample(SOI).fineGrain(fgbit) * fgbit + SOI*3); 
+	    // fill this plot if fg bit 1, 2, or 3 is 1 in this TS
+	  }
+	}
+
+	tp_fg0_ = digi.t0().fineGrain(0);
+	tp_fg1_ = digi.t0().fineGrain(1);
+	tp_fg2_ = digi.t0().fineGrain(2);
+	tp_fg3_ = digi.t0().fineGrain(3);
+	tp_fg4_ = digi.t0().fineGrain(4);
+	tp_fg5_ = digi.t0().fineGrain(5);
+      }
+      // 3 = digi.presamples()+1. checked from -3 to +4, only -1 and -2 had non-zero entries
+      if ( abs(id.ieta()) <= 15 && id.iphi() == 1 ) {
+	/*
+	if (digi.sample(0).fineGrain(3) == 1) std::cout << "fine grain bits 3 (delay2) = 1 in digi.sample(0) at ieta = " << id.ieta() << std::endl;
+	if (digi.sample(1).fineGrain(3) == 1) std::cout << "fine grain bits 3 (delay2) = 1 in digi.sample(1) at ieta = " << id.ieta() << std::endl;
+	if (digi.sample(2).fineGrain(3) == 1) std::cout << "fine grain bits 3 (delay2) = 1 in digi.sample(2) at ieta = " << id.ieta() << std::endl;
+	if (digi.sample(3).fineGrain(3) == 1) std::cout << "fine grain bits 3 (delay2) = 1 in digi.sample(3) at ieta = " << id.ieta() << std::endl;
+	if (digi.sample(4).fineGrain(3) == 1) std::cout << "fine grain bits 3 (delay2) = 1 in digi.sample(4) at ieta = " << id.ieta() << std::endl; */
+	//	if (digi.t0().fineGrain(3) == 1) std::cout << "fine grain bits 3 (delay2) = 1 in digi.t0() at ieta = " << id.ieta() << " and all fine grain bits = " << digi.t0().fineGrain(0) << digi.t0().fineGrain(1) << digi.t0().fineGrain(2) << digi.t0().fineGrain(3) << digi.t0().fineGrain(4) << digi.t0().fineGrain(5) << " fg0, fg1...fg5" <<  std::endl;
+      }
+      /*      tp_fg0_t1_ = digi.sample(digi.presamples()-1).fineGrain(0);
+      tp_fg1_t1_ = digi.sample(digi.presamples()-1).fineGrain(1);
+      tp_fg2_t1_ = digi.sample(digi.presamples()-1).fineGrain(2);
+      tp_fg3_t1_ = digi.sample(digi.presamples()-1).fineGrain(3);
+      tp_fg4_t1_ = digi.sample(digi.presamples()-1).fineGrain(4);
+      tp_fg5_t1_ = digi.sample(digi.presamples()-1).fineGrain(5);
+      tp_fg0_t2_ = digi.sample(digi.presamples()-2).fineGrain(0);
+      tp_fg1_t2_ = digi.sample(digi.presamples()-2).fineGrain(1);
+      tp_fg2_t2_ = digi.sample(digi.presamples()-2).fineGrain(2);
+      tp_fg3_t2_ = digi.sample(digi.presamples()-2).fineGrain(3);
+      tp_fg4_t2_ = digi.sample(digi.presamples()-2).fineGrain(4);
+      tp_fg5_t2_ = digi.sample(digi.presamples()-2).fineGrain(5); */
+
+      int OFFSET_TDC = 8;
+      int MASK_TDC_HB = 0x3;
+      int MASK_TDC_HE = 0x3F;
+      if (abs(tp_ieta_) <= 16) {
+	HB_TDC_ = ((digi.t0()).raw() >> OFFSET_TDC ) & MASK_TDC_HB; // digi is a HcalTriggerPrimitiveDigi, where .t0() gives SOI, and raw gives full output (HcalTriggerPrimitiveSample.h)
+	HB_TDC_t1m_ = (digi.sample(digi.presamples()-1).raw() >> OFFSET_TDC ) & MASK_TDC_HB;
+	HB_TDC_t2m_ = (digi.sample(digi.presamples()-2).raw() >> OFFSET_TDC ) & MASK_TDC_HB;
+	HB_TDC_t1_ = (digi.sample(digi.presamples()+1).raw() >> OFFSET_TDC ) & MASK_TDC_HB;
+        HB_TDC_t2_ = (digi.sample(digi.presamples()+2).raw() >> OFFSET_TDC ) & MASK_TDC_HB;
+
+	//investigations into where the fine grain bits are set
+       
+	/*	if ((tp_ieta_ == 1 && tp_iphi_ == 1) && (tp_fg0_t1_ != 0 || tp_fg1_t1_ != 0 || tp_fg2_t1_ != 0 || tp_fg3_t1_ != 0)) {
+	  std::cout << "Fine grain bits non-zero in SOI-1, with HB TDC (SOI-2, SOI-1, SOI, SOI+1, SOI+2) = " << HB_TDC_t2m_ << ", " << HB_TDC_t1m_ << ", " << HB_TDC_ << ", " << HB_TDC_t1_ << ", " << HB_TDC_t2_ << ", " << " at tp ieta, iphi = " << tp_ieta_ << ", " << tp_iphi_ << ", " << tp_depth_ << " and fine grain bits for SOI-2 and SOI-1 and SOI = " << tp_fg0_t2_ << tp_fg1_t2_ << tp_fg2_t2_ << tp_fg3_t2_ << tp_fg4_t2_ << tp_fg5_t2_ << ", SOI-1: " << tp_fg0_t1_ << tp_fg1_t1_ << tp_fg2_t1_ << tp_fg3_t1_ << tp_fg4_t1_ << tp_fg5_t1_ << ", and SOI: " << tp_fg0_ << tp_fg1_ << tp_fg2_ << tp_fg3_ << tp_fg4_ << tp_fg5_ << std::endl;
+	}
+	if ((tp_ieta_ == 1 && tp_iphi_ == 1) && (HB_TDC_ == 2 || HB_TDC_t1m_ == 2 || HB_TDC_t1_ == 2 )) { 
+	  std::cout << "TDC of 2 in HB, with HB TDC (SOI-1, SOI, SOI+1) = " << HB_TDC_t1m_ << ", " << HB_TDC_ << ", " << HB_TDC_t1_ << " at tp ieta, iphi, depth = " << tp_ieta_ << ", " << tp_iphi_ << ", " << tp_depth_ << " and fine grain bits for SOI-2, SOI-1, and SOI = " << tp_fg0_t2_ << tp_fg1_t2_ << tp_fg2_t2_ << tp_fg3_t2_ << tp_fg4_t2_ << tp_fg5_t2_ << ", SOI-1: " << tp_fg0_t1_ << tp_fg1_t1_ << tp_fg2_t1_ << tp_fg3_t1_ << tp_fg4_t1_ << tp_fg5_t1_ << ", and SOI: " << tp_fg0_ << tp_fg1_ << tp_fg2_ << tp_fg3_ << tp_fg4_ << tp_fg5_ << std::endl;
+	  } */
+      }
+      if (abs(tp_ieta_) > 16) HE_TDC_ = ((digi.t0()).raw() >> OFFSET_TDC ) & MASK_TDC_HE;
 
       if (tp_et_ < threshold_)
          continue;
@@ -396,7 +530,7 @@ AnalyzeTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
          new_count_ = 0;
          old_et_ = tp_et_;
          old_fg0_ = tp_fg0_;
-         old_fg1_ = tp_fg1_;
+	 old_fg1_ = tp_fg1_;
          new_fg0_ = 0;
          new_fg1_ = 0;
          for (const auto& m: matches) {
