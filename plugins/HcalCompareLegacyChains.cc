@@ -130,6 +130,13 @@ class HcalCompareLegacyChains : public edm::EDAnalyzer {
 
       int max_severity_;
 
+      edm::ESGetToken<HcalTrigTowerGeometry, CaloGeometryRecord> tok_hcalTrigTowerGeometry_;
+      edm::ESGetToken<HcalDbService, HcalDbRecord> tok_hcalConditions_;
+      edm::ESGetToken<HcalSeverityLevelComputer, HcalSeverityLevelComputerRcd> tok_hcalSeverityLevelComputer_;
+      edm::ESGetToken<HcalChannelQuality, HcalChannelQualityRcd> tok_hcalChannelQuality_;
+      edm::ESGetToken<CaloGeometry, CaloGeometryRecord> tok_caloGeo_;
+      edm::ESGetToken<CaloTPGTranscoder, CaloTPGRecord> tok_hcalCoder_;
+
       const HcalChannelQuality* status_;
       const HcalSeverityLevelComputer* comp_;
 };
@@ -141,7 +148,13 @@ HcalCompareLegacyChains::HcalCompareLegacyChains(const edm::ParameterSet& config
    digis_(config.getParameter<edm::InputTag>("triggerPrimitives")),
    rechits_(config.getParameter<std::vector<edm::InputTag>>("recHits")),
    swap_iphi_(config.getParameter<bool>("swapIphi")),
-   max_severity_(config.getParameter<int>("maxSeverity"))
+   max_severity_(config.getParameter<int>("maxSeverity")),
+   tok_hcalTrigTowerGeometry_(esConsumes<HcalTrigTowerGeometry, CaloGeometryRecord>()),
+   tok_hcalConditions_(esConsumes<HcalDbService, HcalDbRecord>()),
+   tok_hcalSeverityLevelComputer_(esConsumes<HcalSeverityLevelComputer, HcalSeverityLevelComputerRcd>()),
+   tok_hcalChannelQuality_(esConsumes<HcalChannelQuality, HcalChannelQualityRcd>()),
+   tok_caloGeo_(esConsumes<CaloGeometry, CaloGeometryRecord>()),
+   tok_hcalCoder_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>())
 {
    consumes<HcalTrigPrimDigiCollection>(digis_);
    consumes<HBHEDigiCollection>(frames_[0]);
@@ -189,6 +202,8 @@ HcalCompareLegacyChains::HcalCompareLegacyChains(const edm::ParameterSet& config
    matches_->Branch("iphi", &mt_iphi_);
    matches_->Branch("tp_version", &mt_version_);
    matches_->Branch("tp_soi", &mt_tp_soi_);
+
+
 }
 
 HcalCompareLegacyChains::~HcalCompareLegacyChains() {}
@@ -204,11 +219,13 @@ HcalCompareLegacyChains::get_cosh(const HcalDetId& id)
 void
 HcalCompareLegacyChains::beginLuminosityBlock(const edm::LuminosityBlock& lumi, const edm::EventSetup& setup)
 {
-   edm::ESHandle<HcalChannelQuality> status;
-   setup.get<HcalChannelQualityRcd>().get("withTopo", status);
+   edm::ESHandle<HcalChannelQuality> status = setup.getHandle(tok_hcalChannelQuality_);
+//   edm::ESHandle<HcalChannelQuality> status;
+//   setup.get<HcalChannelQualityRcd>().get("withTopo", status);
    status_ = status.product();
-   edm::ESHandle<HcalSeverityLevelComputer> comp;
-   setup.get<HcalSeverityLevelComputerRcd>().get(comp);
+   edm::ESHandle<HcalSeverityLevelComputer> comp = setup.getHandle(tok_hcalSeverityLevelComputer_);
+//   edm::ESHandle<HcalSeverityLevelComputer> comp;
+//   setup.get<HcalSeverityLevelComputerRcd>().get(comp);
    comp_ = comp.product();
 }
 
@@ -217,10 +234,10 @@ HcalCompareLegacyChains::analyze(const edm::Event& event, const edm::EventSetup&
 {
    using namespace edm;
 
-   edm::ESHandle<HcalTrigTowerGeometry> tpd_geo_h;
-   setup.get<CaloGeometryRecord>().get(tpd_geo_h);
-   edm::ESHandle<HcalDbService> conditions;
-   setup.get<HcalDbRecord>().get(conditions);
+   edm::ESHandle<HcalTrigTowerGeometry> tpd_geo_h = setup.getHandle(tok_hcalTrigTowerGeometry_);
+   edm::ESHandle<HcalDbService> conditions = setup.getHandle(tok_hcalConditions_);
+//   edm::ESHandle<HcalDbService> conditions;
+//   setup.get<HcalDbRecord>().get(conditions);
    const HcalTrigTowerGeometry& tpd_geo = *tpd_geo_h;
 
    // ==========
@@ -296,7 +313,7 @@ HcalCompareLegacyChains::analyze(const edm::Event& event, const edm::EventSetup&
       /* return; */
    }
 
-   setup.get<CaloGeometryRecord>().get(gen_geo_);
+   gen_geo_ = setup.getHandle(tok_caloGeo_);
 
    auto isValid = [&](const auto& hit) {
       HcalDetId id(hit.id());
@@ -343,8 +360,7 @@ HcalCompareLegacyChains::analyze(const edm::Event& event, const edm::EventSetup&
    // setup.get<L1CaloHcalScaleRcd>().get(hcal_scale);
    // const L1CaloHcalScale* h = hcal_scale.product();
 
-   ESHandle<CaloTPGTranscoder> decoder;
-   setup.get<CaloTPGRecord>().get(decoder);
+   ESHandle<CaloTPGTranscoder> decoder = setup.getHandle(tok_hcalCoder_);
 
    for (const auto& digi: *digis) {
       HcalTrigTowerDetId id = digi.id();

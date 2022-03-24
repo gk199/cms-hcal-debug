@@ -103,6 +103,8 @@ class AnalyzeTP : public edm::EDAnalyzer {
       std::vector<edm::InputTag> vtxToken_;
       
       double threshold_;
+      edm::ESGetToken<CaloTPGTranscoder, CaloTPGRecord> tok_hcalCoder_;
+      edm::ESGetToken<HcalTrigTowerGeometry, CaloGeometryRecord> tok_hcalTrigTowerGeometry_;
       
       //
   //      edm::EDGetTokenT<edm::TriggerResults> triggerBits_;
@@ -167,7 +169,9 @@ AnalyzeTP::AnalyzeTP(const edm::ParameterSet& config):
   doReco_(config.getParameter<bool>("doReco")),
   maxVtx_(config.getParameter<unsigned int>("maxVtx")),
   vtxToken_(config.getUntrackedParameter<std::vector<edm::InputTag>>("vtxToken")),
-  threshold_(config.getUntrackedParameter<double>("threshold", 0.0)) 
+  threshold_(config.getUntrackedParameter<double>("threshold", 0.0)),
+  tok_hcalCoder_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>()),
+  tok_hcalTrigTowerGeometry_(esConsumes<HcalTrigTowerGeometry, CaloGeometryRecord>())
   //  triggerBits_( consumes<edm::TriggerResults>(config.getParameter<edm::InputTag>("bits")) )
 {
    edm::Service<TFileService> fs;
@@ -256,8 +260,7 @@ AnalyzeTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       return;
    }
 
-   ESHandle<CaloTPGTranscoder> decoder;
-   setup.get<CaloTPGRecord>().get(decoder);
+   ESHandle<CaloTPGTranscoder> decoder = setup.getHandle(tok_hcalCoder_);
 
    std::unordered_map<int, std::unordered_map<int, double>> old_ets;
    std::unordered_map<int, std::unordered_map<int, double>> new_ets;
@@ -279,8 +282,9 @@ AnalyzeTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
    ev_ntp_hf_thr5_ = 0;
 
    
-   ESHandle<HcalTrigTowerGeometry> tpd_geo;
-   setup.get<CaloGeometryRecord>().get(tpd_geo);
+   ESHandle<HcalTrigTowerGeometry> tpd_geo = setup.getHandle(tok_hcalTrigTowerGeometry_);
+//   ESHandle<HcalTrigTowerGeometry> tpd_geo;
+//   setup.get<CaloGeometryRecord>().get(tpd_geo);
 
    if (saturation_->Integral() == 0) {
       for (int i = 1; i <= 42; ++i) {

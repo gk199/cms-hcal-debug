@@ -90,6 +90,8 @@ class CompareTP : public edm::EDAnalyzer {
 
       bool swap_iphi_;
 
+      edm::ESGetToken<CaloTPGTranscoder, CaloTPGRecord> tok_hcalCoder_;
+
       int run_;
       int lumi_;
       int event_;
@@ -118,7 +120,8 @@ CompareTP::CompareTP(const edm::ParameterSet& config) :
    edm::EDAnalyzer(),
    digis_(config.getParameter<edm::InputTag>("triggerPrimitives")),
    edigis_(config.getParameter<edm::InputTag>("emulTriggerPrimitives")),
-   swap_iphi_(config.getParameter<bool>("swapIphi"))
+   swap_iphi_(config.getParameter<bool>("swapIphi")),
+   tok_hcalCoder_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>())
 {
    edm::Service<TFileService> fs;
 
@@ -188,8 +191,7 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       return;
    }
 
-   ESHandle<CaloTPGTranscoder> decoder;
-   setup.get<CaloTPGRecord>().get(decoder);
+   ESHandle<CaloTPGTranscoder> decoder = setup.getHandle(tok_hcalCoder_);
 
    std::unordered_set<HcalTrigTowerDetId> ids;
    typedef std::unordered_map<HcalTrigTowerDetId, HcalTriggerPrimitiveDigi> digi_map;
