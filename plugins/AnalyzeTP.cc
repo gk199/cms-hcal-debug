@@ -146,6 +146,7 @@ class AnalyzeTP : public edm::EDAnalyzer {
       TH1D *finegrain5_;
       TH1D *tp_fg_SOI_;
       TH2D *finegrain_vs_event_;
+      TH2D *energy_vs_event_;
 
       int tp_fg0_;
       int tp_fg1_;
@@ -217,6 +218,7 @@ AnalyzeTP::AnalyzeTP(const edm::ParameterSet& config):
    finegrain5_ = fs->make<TH1D>("finegrain5","Finegrain bit 5 in SOI",4,-1,3);
    tp_fg_SOI_ = fs->make<TH1D>("tp_fg_SOI","Finegrain bit 0-5 in SOI",64,0,63);
    finegrain_vs_event_ = fs->make<TH2D>("finegrain_vs_event","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
+   energy_vs_event_ = fs->make<TH2D>("energy_vs_event","Energy in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
 
    saturation_ = fs->make<TH1D>("saturation", "", 42, 0.5, 42.5);
    delta_ = fs->make<TH1D>("delta", "", 42, 0.5, 42.5);
@@ -429,6 +431,7 @@ AnalyzeTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
 	    if (digi.sample(SOI).fineGrain(fgbit) == 1) finegrain_vs_event_->Fill(event.id().event(),digi.sample(SOI).fineGrain(fgbit) * fgbit + SOI*3); 
 	    // fill this plot if fg bit 1, 2, or 3 is 1 in this TS
 	  }
+	  if (digi.sample(SOI).compressedEt() > 0) energy_vs_event_->Fill(event.id().event(),SOI*3);
 	}
 
 	tp_fg0_ = digi.t0().fineGrain(0);
