@@ -32,6 +32,13 @@ branchNames =  ["soi",
 		"fg4",
 		"fg5",
 		"fg6",
+                "fg0_soim1",
+                "fg1_soim1",
+                "fg2_soim1",
+                "fg3_soim1",
+                "fg4_soim1",
+                "fg5_soim1",
+                "fg6_soim1",
                 "fg0_emul",
                 "fg1_emul",
                 "fg2_emul",
@@ -39,6 +46,13 @@ branchNames =  ["soi",
                 "fg4_emul",
                 "fg5_emul",
                 "fg6_emul",
+                "fg0_soim1_emul",
+                "fg1_soim1_emul",
+                "fg2_soim1_emul",
+                "fg3_soim1_emul",
+                "fg4_soim1_emul",
+                "fg5_soim1_emul",
+                "fg6_soim1_emul",
 		"adc0",
 		"adc1",
 		"adc2",
@@ -77,6 +91,7 @@ histos = {
 	"et"			: ROOT.TH1F("et","et",100,0,100),
 	"et_emul"		: ROOT.TH1F("et_emul","et_emul",100,0,100),
         "et_corr"	        : ROOT.TH2F("et_corr","et",100,0,100,100,0,100),
+        "et_corr_HB"            : ROOT.TH2F("et_corr_HB","et",100,0,100,100,0,100),
         "et_corr13"	        : ROOT.TH2F("et_corr13","",128,0,128,128,0,128),
         "et_corr14"	        : ROOT.TH2F("et_corr14","",128,0,128,128,0,128),
         "et_corr15"	        : ROOT.TH2F("et_corr15","",128,0,128,128,0,128),
@@ -89,13 +104,23 @@ histos = {
 #	"zsMarkAndPass_emul"	: ROOT.TH1F("zsMarkAndPass_emul","zsMarkAndPass_emul",100,0,100),
 	"fg1"			: ROOT.TH1F("fg1","fg1",2,0,2),
 	"fg1_emul"		: ROOT.TH1F("fg1_emul","fg1_emul",2,0,2),
-        "fg1_corr"              : ROOT.TH2F("fg1_corr","fg1",2,0,2,2,0,2),
         "fg0_corr"              : ROOT.TH2F("fg0_corr","fg0",2,0,2,2,0,2),
+        "fg1_corr"              : ROOT.TH2F("fg1_corr","fg1",2,0,2,2,0,2),
         "fg2_corr"              : ROOT.TH2F("fg2_corr","fg2",2,0,2,2,0,2),
         "fg3_corr"              : ROOT.TH2F("fg3_corr","fg3",2,0,2,2,0,2),
         "fg4_corr"              : ROOT.TH2F("fg4_corr","fg4",2,0,2,2,0,2),
         "fg5_corr"              : ROOT.TH2F("fg5_corr","fg5",2,0,2,2,0,2),
         "fg6_corr"              : ROOT.TH2F("fg6_corr","fg6",2,0,2,2,0,2),
+        "fg0_corr_soim1"        : ROOT.TH2F("fg0_corr_soim1","fg0_soim1",2,0,2,2,0,2),
+        "fg1_corr_soim1"        : ROOT.TH2F("fg1_corr_soim1","fg1_soim1",2,0,2,2,0,2),
+        "fg2_corr_soim1"        : ROOT.TH2F("fg2_corr_soim1","fg2_soim1",2,0,2,2,0,2),
+        "fg3_corr_soim1"        : ROOT.TH2F("fg3_corr_soim1","fg3_soim1",2,0,2,2,0,2),
+        "fg4_corr_soim1"        : ROOT.TH2F("fg4_corr_soim1","fg4_soim1",2,0,2,2,0,2),
+        "fg5_corr_soim1"        : ROOT.TH2F("fg5_corr_soim1","fg5_soim1",2,0,2,2,0,2),
+        "fg6_corr_soim1"        : ROOT.TH2F("fg6_corr_soim1","fg6_soim1",2,0,2,2,0,2),
+        "fg1_corr_off1"         : ROOT.TH2F("fg1_corr_off1","fg1_soim1",2,0,2,2,0,2),
+        "fg2_corr_off1"         : ROOT.TH2F("fg2_corr_off1","fg2_soim1",2,0,2,2,0,2),
+        "fg3_corr_off1"         : ROOT.TH2F("fg3_corr_off1","fg3_soim1",2,0,2,2,0,2),
 	"adc0"			: ROOT.TH1F("adc0","adc0",100,0,300),
         "adc0_emul"             : ROOT.TH1F("adc0_emul","adc0_emul",100,0,300),
         "adc0_corr"             : ROOT.TH2F("adc0_corr","adc0",60,-0.5,59.5,60,-0.5,59.5),
@@ -127,7 +152,9 @@ evtsTree.Draw("soi_emul:soi>>soi_corr")
 #evtsTree.Draw("et>>et")
 #evtsTree.Draw("et_emul>>et_emul")
 #evtsTree.Draw("npresamples_emul:npresamples>>npresamples_corr")
+evtsTree.Draw("et_emul:et>>et_corr_HB", "abs(ieta) < 16")
 evtsTree.Draw("et_emul:et>>et_corr")
+
 #evtsTree.Draw("fg1>>fg1")
 #evtsTree.Draw("fg1_emul>>fg1_emul")
 evtsTree.Draw("fg0_emul:fg0>>fg0_corr", "abs(ieta) < 16")
@@ -137,6 +164,16 @@ evtsTree.Draw("fg3_emul:fg3>>fg3_corr", "abs(ieta) < 16")
 evtsTree.Draw("fg4_emul:fg4>>fg4_corr", "abs(ieta) < 16")
 evtsTree.Draw("fg5_emul:fg5>>fg5_corr", "abs(ieta) < 16")
 evtsTree.Draw("fg6_emul:fg6>>fg6_corr", "abs(ieta) < 16")
+evtsTree.Draw("fg0_soim1_emul:fg0_soim1>>fg0_corr_soim1", "abs(ieta) < 16")
+evtsTree.Draw("fg1_soim1_emul:fg1_soim1>>fg1_corr_soim1", "abs(ieta) < 16")
+evtsTree.Draw("fg2_soim1_emul:fg2_soim1>>fg2_corr_soim1", "abs(ieta) < 16")
+evtsTree.Draw("fg3_soim1_emul:fg3_soim1>>fg3_corr_soim1", "abs(ieta) < 16")
+evtsTree.Draw("fg4_soim1_emul:fg4_soim1>>fg4_corr_soim1", "abs(ieta) < 16")
+evtsTree.Draw("fg5_soim1_emul:fg5_soim1>>fg5_corr_soim1", "abs(ieta) < 16")
+evtsTree.Draw("fg6_soim1_emul:fg6_soim1>>fg6_corr_soim1", "abs(ieta) < 16")
+evtsTree.Draw("fg1_emul:fg1_soim1>>fg1_corr_off1", "abs(ieta) < 16")
+evtsTree.Draw("fg2_emul:fg2_soim1>>fg2_corr_off1", "abs(ieta) < 16")
+evtsTree.Draw("fg3_emul:fg3_soim1>>fg3_corr_off1", "abs(ieta) < 16")
 #evtsTree.Draw("adc0>>adc0")
 #evtsTree.Draw("adc0_emul>>adc0_emul")
 #evtsTree.Draw("adc0_emul:adc0>>adc0_corr")
@@ -168,7 +205,7 @@ evtsTree.Draw("iphi:ieta>>ieta_iphi_fg4", "fg4!=fg4_emul && et > 0")
 evtsTree.Draw("iphi:ieta>>ieta_iphi_fg5", "fg5!=fg5_emul && et > 0")
 #evtsTree.Draw("iphi:ieta>>ieta_iphi", "soi==soi_emul && soi > 0")
 #evtsTree.Draw("iphi:ieta>>ieta_iphi", "soi!=soi_emul && ieta < 0 && ((iphi > 18 && iphi < 23) || (iphi > 34 && iphi < 39))")
-#evtsTree.Draw("iphi:ieta>>ieta_iphi", "et!=et_emul")
+evtsTree.Draw("iphi:ieta>>ieta_iphi", "et!=et_emul")
 #evtsTree.Draw("et_emul:et>>et_corr13", "ieta==-19 && (iphi==35 || iphi==19)")
 #evtsTree.Draw("et_emul:et>>et_corr14", "ieta==-9 && (iphi==36 || iphi==20)")
 #evtsTree.Draw("et_emul:et>>et_corr15", "ieta==-9 && (iphi==37 || iphi==21)")
@@ -219,15 +256,31 @@ c = ROOT.TCanvas("c","c",800,800)
 histos["et_corr"].Draw("colz")
 histos["et_corr"].GetYaxis().SetTitle("Emul")
 histos["et_corr"].GetXaxis().SetTitle("Data")
-histos["et_corr"].SetTitle("ET emulator vs data")
+histos["et_corr"].SetTitle("ET emulator vs data, SOI")
 c.SetRightMargin(0.15)
 c.SaveAs("test/hists_347746/et_corr.png")
+
+c = ROOT.TCanvas("c","c",800,800)
+histos["et_corr_HB"].Draw("colz")
+histos["et_corr_HB"].GetYaxis().SetTitle("Emul")
+histos["et_corr_HB"].GetXaxis().SetTitle("Data")
+histos["et_corr_HB"].SetTitle("ET emulator vs data, SOI, abs(ieta)<16")
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/et_corr_HB.png")
+
+c = ROOT.TCanvas("c","c",800,800)
+histos["ieta_iphi"].Draw("colz")
+histos["ieta_iphi"].GetYaxis().SetTitle("iphi")
+histos["ieta_iphi"].GetXaxis().SetTitle("ieta")
+histos["ieta_iphi"].SetTitle("ieta vs iphi for et!=et_emu in SOI")
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/ietaViphi.png")
 
 c = ROOT.TCanvas("c","c",800,800)
 histos["ieta_iphi_fg0"].Draw("colz")
 histos["ieta_iphi_fg0"].GetYaxis().SetTitle("iphi")
 histos["ieta_iphi_fg0"].GetXaxis().SetTitle("ieta")
-histos["ieta_iphi_fg0"].SetTitle("ieta vs iphi for fg0!=fg0_emul && et > 0")
+histos["ieta_iphi_fg0"].SetTitle("ieta vs iphi for fg0!=fg0_emul && et > 0 in SOI")
 c.SetRightMargin(0.15)
 c.SaveAs("test/hists_347746/ietaViphi_fg0.png")
 
@@ -235,7 +288,7 @@ c = ROOT.TCanvas("c","c",800,800)
 histos["ieta_iphi_fg1"].Draw("colz")
 histos["ieta_iphi_fg1"].GetYaxis().SetTitle("iphi")
 histos["ieta_iphi_fg1"].GetXaxis().SetTitle("ieta")
-histos["ieta_iphi_fg1"].SetTitle("ieta vs iphi for fg1!=fg1_emul && et > 0")
+histos["ieta_iphi_fg1"].SetTitle("ieta vs iphi for fg1!=fg1_emul && et > 0 in SOI")
 c.SetRightMargin(0.15)
 c.SaveAs("test/hists_347746/ietaViphi_fg1.png")
 
@@ -299,8 +352,63 @@ c.SetLogz()
 c.SetRightMargin(0.15)
 c.SaveAs("test/hists_347746/fg3_corr.png")
 
+# finegrain SOI-1 comparison plots
+c = ROOT.TCanvas("c","c",800,800)
+histos["fg1_corr_soim1"].Draw("colz")
+histos["fg1_corr_soim1"].GetYaxis().SetTitle("Emul")
+histos["fg1_corr_soim1"].GetXaxis().SetTitle("Data")
+histos["fg1_corr_soim1"].SetTitle("Finegrain bit 1 data vs emu for abs(ieta) < 16, SOI-1")
+c.SetLogz()
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/fg1_corr_soim1.png")
+
+c = ROOT.TCanvas("c","c",800,800)
+histos["fg2_corr_soim1"].Draw("colz")
+histos["fg2_corr_soim1"].GetYaxis().SetTitle("Emul")
+histos["fg2_corr_soim1"].GetXaxis().SetTitle("Data")
+histos["fg2_corr_soim1"].SetTitle("Finegrain bit 2 data vs emu for abs(ieta) < 16, SOI-1")
+c.SetLogz()
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/fg2_corr_soim1.png")
+
+c = ROOT.TCanvas("c","c",800,800)
+histos["fg3_corr_soim1"].Draw("colz")
+histos["fg3_corr_soim1"].GetYaxis().SetTitle("Emul")
+histos["fg3_corr_soim1"].GetXaxis().SetTitle("Data")
+histos["fg3_corr_soim1"].SetTitle("Finegrain bit 3 data vs emu for abs(ieta) < 16, SOI-1")
+c.SetLogz()
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/fg3_corr_soim1.png")
+
+# fine grain bit in SOI and SOI-1 comparison
+c = ROOT.TCanvas("c","c",800,800)
+histos["fg1_corr_off1"].Draw("colz")
+histos["fg1_corr_off1"].GetYaxis().SetTitle("Emul")
+histos["fg1_corr_off1"].GetXaxis().SetTitle("Data")
+histos["fg1_corr_off1"].SetTitle("Finegrain bit 1 data (SOI-1) vs emu (SOI) for abs(ieta) < 16")
+c.SetLogz()
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/fg1_corr_off1.png")
+
+c = ROOT.TCanvas("c","c",800,800)
+histos["fg2_corr_off1"].Draw("colz")
+histos["fg2_corr_off1"].GetYaxis().SetTitle("Emul")
+histos["fg2_corr_off1"].GetXaxis().SetTitle("Data")
+histos["fg2_corr_off1"].SetTitle("Finegrain bit 2 data (SOI-1) vs emu (SOI) for abs(ieta) < 16")
+c.SetLogz()
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/fg2_corr_off1.png")
+
+c = ROOT.TCanvas("c","c",800,800)
+histos["fg3_corr_off1"].Draw("colz")
+histos["fg3_corr_off1"].GetYaxis().SetTitle("Emul")
+histos["fg3_corr_off1"].GetXaxis().SetTitle("Data")
+histos["fg3_corr_off1"].SetTitle("Finegrain bit 3 data (SOI-1) vs emu (SOI) for abs(ieta) < 16")
+c.SetLogz()
+c.SetRightMargin(0.15)
+c.SaveAs("test/hists_347746/fg3_corr_off1.png")
+
 # ET correlation for specific regions
-'''
 c = ROOT.TCanvas("c","c",800,800)
 histos["et_corr13"].Draw("colz")
 histos["et_corr13"].GetYaxis().SetTitle("Emul")
@@ -364,5 +472,3 @@ histos["et_corr20"].GetXaxis().SetTitle("Data")
 c.SetLogz()
 c.SetRightMargin(0.15)
 c.SaveAs("test/hists_347746/et_corr20.png")
-
-'''

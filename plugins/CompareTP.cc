@@ -113,7 +113,9 @@ class CompareTP : public edm::EDAnalyzer {
       bool tp_zsMarkAndPass_;
       bool tp_zsMarkAndPass_emul_;
       std::array<int, FGCOUNT> tp_fg_;
+      std::array<int, FGCOUNT> tp_fg_soim1_;
       std::array<int, FGCOUNT> tp_fg_emul_;
+      std::array<int, FGCOUNT> tp_fg_emul_soim1_;
 };
 
 CompareTP::CompareTP(const edm::ParameterSet& config) :
@@ -147,8 +149,12 @@ CompareTP::CompareTP(const edm::ParameterSet& config) :
 
    for (unsigned int i = 0; i < tp_fg_.size(); ++i)
       tps_->Branch(("fg" + std::to_string(i)).c_str(), &tp_fg_[i]);
+   for (unsigned int i = 0; i < tp_fg_soim1_.size(); ++i)
+     tps_->Branch(("fg" + std::to_string(i) + "_soim1").c_str(), &tp_fg_soim1_[i]);
    for (unsigned int i = 0; i < tp_fg_emul_.size(); ++i)
       tps_->Branch(("fg" + std::to_string(i) + "_emul").c_str(), &tp_fg_emul_[i]);
+   for (unsigned int i = 0; i < tp_fg_emul_soim1_.size(); ++i)
+     tps_->Branch(("fg" + std::to_string(i) + "_soim1_emul").c_str(), &tp_fg_emul_soim1_[i]);
 
    for (unsigned int i = 0; i < tp_adc_.size(); ++i)
       tps_->Branch(("adc" + std::to_string(i)).c_str(), (int*) &(tp_adc_[i]));
@@ -223,6 +229,8 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
          tp_et_ = decoder->hcaletValue(id, digi->second.t0());
          for (unsigned int i = 0; i < tp_fg_.size(); ++i)
             tp_fg_[i] = digi->second.t0().fineGrain(i);
+	 for (unsigned int i = 0; i < tp_fg_soim1_.size(); ++i)
+	   tp_fg_soim1_[i] = digi->second.sample(1).fineGrain(i);
          for (unsigned int i = 0; i < tp_adc_.size(); ++i)
             tp_adc_[i] = digi->second[i].compressedEt();
       } else {
@@ -249,6 +257,8 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
          tp_et_emul_ = decoder->hcaletValue(id, digi->second.t0());
          for (unsigned int i = 0; i < tp_fg_emul_.size(); ++i)
             tp_fg_emul_[i] = digi->second.t0().fineGrain(i);
+         for (unsigned int i = 0; i < tp_fg_emul_soim1_.size(); ++i)
+	   tp_fg_emul_soim1_[i] = digi->second.sample(1).fineGrain(i);
          for (unsigned int i = 0; i < tp_adc_emul_.size(); ++i)
             tp_adc_emul_[i] = digi->second[i].compressedEt();
       } else {
