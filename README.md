@@ -1,3 +1,7 @@
+# Location
+
+This is in `/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_12_3_0/src/Debug/HcalDebug`. Used for initial fine grain bit testing, before moving to a CMSSW area with more printouts in the HcalTriggerPrimitiveAlgo emulator files to see the corresponding TDC values, done in `/afs/cern.ch/work/g/gkopp/MWGR/EmulTesting/CMSSW_12_3_0/src/Debug/HcalDebug`, and connected to the github [here](https://github.com/gk199/cms-hcal-debug/tree/Data-Emul_LEDscan_v2). 
+
 # Setup
 
 Install with:
