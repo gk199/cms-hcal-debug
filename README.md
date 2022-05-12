@@ -1,3 +1,17 @@
+# Quick Start
+## lxplus location
+`/afs/cern.ch/work/g/gkopp/MWGR/EmulTesting/CMSSW_12_3_0/src/Debug/HcalDebug` for fine grain bit analysis from LED scans.
+
+## Running Instructions
+Run with:
+```
+cmsRun analyze_2021_tp_data_347746.py
+python3 test/CompareDataEmul.py
+emacs plugins/CompareTP.cc plugins/AnalyzeTP.cc
+scp "gkopp@lxplus.cern.ch:/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_12_3_0/src/Debug/HcalDebug/test/hists_347746/*" LEDscan/QIEscan
+```
+`CompareTP` and	`AnalyzeTP` change what is saved in root file, `CompareDataEmul` does the data-emulator comparison plots.
+
 # Setup
 
 Install with:
