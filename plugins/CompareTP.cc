@@ -88,7 +88,7 @@ class CompareTP : public edm::EDAnalyzer {
       edm::InputTag digis_;
       edm::InputTag edigis_;
 
-      edm::InputTag QIE11_;
+  //      edm::InputTag QIE11_;
 
       bool swap_iphi_;
 
@@ -154,7 +154,7 @@ CompareTP::CompareTP(const edm::ParameterSet& config) :
    edm::EDAnalyzer(),
    digis_(config.getParameter<edm::InputTag>("triggerPrimitives")),
    edigis_(config.getParameter<edm::InputTag>("emulTriggerPrimitives")),
-   QIE11_(config.getParameter<edm::InputTag>("hcalDigiCollectionTag")),
+   //   QIE11_(config.getParameter<edm::InputTag>("hcalDigiCollectionTag")),
    swap_iphi_(config.getParameter<bool>("swapIphi")),
    tok_hcalCoder_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>())
 {
@@ -162,7 +162,7 @@ CompareTP::CompareTP(const edm::ParameterSet& config) :
 
    consumes<HcalTrigPrimDigiCollection>(digis_);
    consumes<HcalTrigPrimDigiCollection>(edigis_);
-   consumes<QIE11DigiCollection>(QIE11_);
+   //   consumes<QIE11DigiCollection>(QIE11_);
 
    finegrain_vs_event_ = fs->make<TH2D>("finegrain_vs_event","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
    finegrain_emul_vs_event_ = fs->make<TH2D>("finegrain_emul_vs_event","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
@@ -265,13 +265,13 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       return;
    }
 
-   Handle<QIE11DigiCollection> QIE11;
+   /*   Handle<QIE11DigiCollection> QIE11;
    if (!event.getByLabel(QIE11_,QIE11)) {
      LogError("CompareTP") << 
        "Can't find QIE11 digi collection with tag '" <<
        QIE11_ << "'" << std::endl;
      return;
-   }
+     } */
 
    ESHandle<CaloTPGTranscoder> decoder = setup.getHandle(tok_hcalCoder_);
 
