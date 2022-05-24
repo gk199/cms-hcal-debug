@@ -88,6 +88,8 @@ class CompareTP : public edm::EDAnalyzer {
       edm::InputTag digis_;
       edm::InputTag edigis_;
 
+      edm::InputTag QIE11_;
+
       bool swap_iphi_;
 
       edm::ESGetToken<CaloTPGTranscoder, CaloTPGRecord> tok_hcalCoder_;
@@ -140,6 +142,8 @@ class CompareTP : public edm::EDAnalyzer {
 
       TH2D *finegrain_vs_event_;
       TH2D *finegrain_emul_vs_event_;
+      TH2D *finegrain_vs_event_ieta1_;
+      TH2D *finegrain_emul_vs_event_ieta1_;
       TH2D *energy_vs_event_;
       TH2D *energy_emul_vs_event_;
       TH2D *SOIenergy_vs_event_;
@@ -150,6 +154,7 @@ CompareTP::CompareTP(const edm::ParameterSet& config) :
    edm::EDAnalyzer(),
    digis_(config.getParameter<edm::InputTag>("triggerPrimitives")),
    edigis_(config.getParameter<edm::InputTag>("emulTriggerPrimitives")),
+   QIE11_(config.getParameter<edm::InputTag>("hcalDigiCollectionTag")),
    swap_iphi_(config.getParameter<bool>("swapIphi")),
    tok_hcalCoder_(esConsumes<CaloTPGTranscoder, CaloTPGRecord>())
 {
@@ -157,9 +162,12 @@ CompareTP::CompareTP(const edm::ParameterSet& config) :
 
    consumes<HcalTrigPrimDigiCollection>(digis_);
    consumes<HcalTrigPrimDigiCollection>(edigis_);
+   consumes<QIE11DigiCollection>(QIE11_);
 
    finegrain_vs_event_ = fs->make<TH2D>("finegrain_vs_event","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
    finegrain_emul_vs_event_ = fs->make<TH2D>("finegrain_emul_vs_event","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
+   finegrain_vs_event_ieta1_ = fs->make<TH2D>("finegrain_vs_event_ieta1","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) at ieta=iphi=1 vs event number",100,0,10000,15,1,16);
+   finegrain_emul_vs_event_ieta1_ = fs->make<TH2D>("finegrain_emul_vs_event_ieta1","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) at ieta=iphi=1 vs event number",100,0,10000,15,1,16);
    energy_vs_event_ = fs->make<TH2D>("energy_vs_event","Energy in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
    energy_emul_vs_event_ = fs->make<TH2D>("energy_emul_vs_event","Energy in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
    SOIenergy_vs_event_ = fs->make<TH2D>("SOIenergy_vs_event","SOI Energy in vs event number",100,0,10000,256,0,255);
@@ -257,12 +265,24 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       return;
    }
 
+   Handle<QIE11DigiCollection> QIE11;
+   if (!event.getByLabel(QIE11_,QIE11)) {
+     LogError("CompareTP") << 
+       "Can't find QIE11 digi collection with tag '" <<
+       QIE11_ << "'" << std::endl;
+     return;
+   }
+
    ESHandle<CaloTPGTranscoder> decoder = setup.getHandle(tok_hcalCoder_);
 
    std::unordered_set<HcalTrigTowerDetId> ids;
    typedef std::unordered_map<HcalTrigTowerDetId, HcalTriggerPrimitiveDigi> digi_map;
    digi_map ds;
    digi_map eds;
+
+   /*   std::unordered_set<HcalDetId> qie_ids;
+   typedef std::unordered_map<HcalDetId, QIE11DataFrame> QIE11_map;
+   QIE11_map qies; */
 
    for (const auto& digi: *digis) {
       ids.insert(digi.id());
@@ -274,6 +294,11 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       eds[digi.id()] = digi;
    }
 
+   /*   for (const auto& digi: *QIE11) {
+     qie_ids.insert(digi.detid());
+     qies[digi.detid()] = digi;
+     }*/
+
    for (const auto& id: ids) {
       if (id.version() == 1 and abs(id.ieta()) >= 40 and id.iphi() % 4 == 1)
          continue;
@@ -283,12 +308,14 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       tp_version_ = id.version();
       digi_map::const_iterator digi;
       if ((digi = ds.find(id)) != ds.end()) {
-	 if (tp_ieta_ == 1 && tp_iphi_ == 1) {
+	//	if (tp_ieta_ == 1 && tp_iphi_ == 1 && ((event.id().event() > 8000 && event.id().event() < 8020) || (event.id().event() > 3000 && event.id().event() < 3020) || (event.id().event() > 6050 && event.id().event() < 6070))) {
+	if (tp_ieta_ == 1 && tp_iphi_ == 1) { 
 	   std::cout << "digi->second.sample(TS).compressedEt() energy for TS0 = " << digi->second.sample(0).compressedEt() << ", TS1 = " << digi->second.sample(1).compressedEt() << ", TS2 = SOI = " << digi->second.sample(2).compressedEt() << " = " << digi->second.SOI_compressedEt() << ", TS3 = " << digi->second.sample(3).compressedEt() << std::endl;
 	   std::cout << "fine grain bits in TS0 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(0).fineGrain(0) << ", " << digi->second.sample(0).fineGrain(1) << ", " << digi->second.sample(0).fineGrain(2) << ", " << digi->second.sample(0).fineGrain(3) << std::endl;
 	   std::cout << "fine grain bits in TS1 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(1).fineGrain(0) << ", " << digi->second.sample(1).fineGrain(1) << ", " << digi->second.sample(1).fineGrain(2) << ", " << digi->second.sample(1).fineGrain(3) << std::endl;
 	   std::cout << "fine grain bits in TS2 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(2).fineGrain(0) << ", " << digi->second.sample(2).fineGrain(1) << ", " << digi->second.sample(2).fineGrain(2) << ", " << digi->second.sample(2).fineGrain(3) << std::endl;
 	   std::cout << "fine grain bits in TS3 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(3).fineGrain(0) << ", " << digi->second.sample(3).fineGrain(1) << ", " << digi->second.sample(3).fineGrain(2) << ", " << digi->second.sample(3).fineGrain(3) << std::endl;
+	   std::cout << "full information for TS2 = SOI is: " << digi->second.sample(2) << ", " << digi->second.t0() << std::endl;
 	 }
 	 
          tp_soi_ = digi->second.SOI_compressedEt();
@@ -310,6 +337,7 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
 	     for (int fgbit = 1; fgbit < 4; fgbit++) {
 	       if (digi->second.sample(SOI).fineGrain(fgbit) == 1) {
 		 finegrain_vs_event_->Fill(event.id().event(),fgbit + SOI*3);
+		 if (id.ieta() == 1 && id.iphi() == 1) finegrain_vs_event_ieta1_->Fill(event.id().event(),fgbit + SOI*3);
 	       }
 	     }
 	     if (digi->second.sample(SOI).compressedEt() > 0) energy_vs_event_->Fill(event.id().event(),SOI*3 + 1); // 1, 4, 7, 10
@@ -346,7 +374,7 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       }
       if ((digi = eds.find(new_id)) != eds.end()) {
 
-	 if (tp_ieta_ == 1 && tp_iphi_ == 1) {
+	if (tp_ieta_ == 1 && tp_iphi_ == 1 && ((event.id().event() > 8000 && event.id().event() < 8020) || (event.id().event() > 3000 && event.id().event() < 3020) || (event.id().event() > 6050 && event.id().event() < 6070))) {
 	   std::cout << "emul digi->second.sample(TS).compressedEt() energy for TS0 = " << digi->second.sample(0).compressedEt() << ", TS1 = " << digi->second.sample(1).compressedEt() << ", TS2 = SOI = " << digi->second.sample(2).compressedEt() << " = " << digi->second.SOI_compressedEt() << ", TS3 = " << digi->second.sample(3).compressedEt() << std::endl;
 	   std::cout <<"emul fine grain bits in TS0 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(0).fineGrain(0) << ", " << digi->second.sample(0).fineGrain(1) << ", " << digi->second.sample(0).fineGrain(2) << ", " << digi->second.sample(0).fineGrain(3) << std::endl;
 	   std::cout << "emul fine grain bits in TS1 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(1).fineGrain(0) << ", " << digi->second.sample(1).fineGrain(1) << ", " << digi->second.sample(1).fineGrain(2) << ", " << digi->second.sample(1).fineGrain(3) << std::endl;
@@ -373,6 +401,7 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
 	     for (int fgbit_emul = 1; fgbit_emul < 4; fgbit_emul++) {
 	       if (digi->second.sample(SOI_emul).fineGrain(fgbit_emul) == 1) {
 		 finegrain_emul_vs_event_->Fill(event.id().event(),fgbit_emul + SOI_emul*3);
+                 if (id.ieta() == 1 && id.iphi() == 1) finegrain_emul_vs_event_ieta1_->Fill(event.id().event(),fgbit_emul + SOI_emul*3);
 	       }
 	     }
 	     if (digi->second.sample(SOI_emul).compressedEt() > 0) energy_emul_vs_event_->Fill(event.id().event(),SOI_emul*3 + 1); // 1, 4, 7, 10
