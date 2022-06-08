@@ -146,6 +146,8 @@ class CompareTP : public edm::EDAnalyzer {
       TH2D *finegrain_emul_vs_event_ieta1_;
       TH2D *energy_vs_event_;
       TH2D *energy_emul_vs_event_;
+      TH2D *energy_vs_event_ieta1_;
+      TH2D *energy_emul_vs_event_ieta1_;
       TH2D *SOIenergy_vs_event_;
       TH2D *SOIenergy_emul_vs_event_;
 };
@@ -170,6 +172,8 @@ CompareTP::CompareTP(const edm::ParameterSet& config) :
    finegrain_emul_vs_event_ieta1_ = fs->make<TH2D>("finegrain_emul_vs_event_ieta1","Finegrain bits 1-3 in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) at ieta=iphi=1 vs event number",100,0,10000,15,1,16);
    energy_vs_event_ = fs->make<TH2D>("energy_vs_event","Energy in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
    energy_emul_vs_event_ = fs->make<TH2D>("energy_emul_vs_event","Energy in SOI-2 to SOI+2 (1-3,4-6,7-9,10-12,13-15) vs event number",100,0,10000,15,1,16);
+   energy_vs_event_ieta1_ = fs->make<TH2D>("energy_vs_event_ieta1","Energy in SOI-2 to SOI+1 (1-3,4-6,7-9,10-12) vs event number (ieta1, iphi1)",100,0,10000,15,1,16);
+   energy_emul_vs_event_ieta1_ = fs->make<TH2D>("energy_emul_vs_event_ieta1","Energy in SOI-2 to SOI+1 (1-3,4-6,7-9,10-12) vs event number (ieta1, iphi1)",100,0,10000,15,1,16);
    SOIenergy_vs_event_ = fs->make<TH2D>("SOIenergy_vs_event","SOI Energy in vs event number",100,0,10000,256,0,255);
    SOIenergy_emul_vs_event_ = fs->make<TH2D>("SOIenergy_emul_vs_event","SOI Energy in vs event number",100,0,10000,256,0,255);
 
@@ -309,8 +313,9 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
       digi_map::const_iterator digi;
       if ((digi = ds.find(id)) != ds.end()) {
 	//	if (tp_ieta_ == 1 && tp_iphi_ == 1 && ((event.id().event() > 8000 && event.id().event() < 8020) || (event.id().event() > 3000 && event.id().event() < 3020) || (event.id().event() > 6050 && event.id().event() < 6070))) {
-	if (tp_ieta_ == 1 && tp_iphi_ == 1) { 
-	   std::cout << "digi->second.sample(TS).compressedEt() energy for TS0 = " << digi->second.sample(0).compressedEt() << ", TS1 = " << digi->second.sample(1).compressedEt() << ", TS2 = SOI = " << digi->second.sample(2).compressedEt() << " = " << digi->second.SOI_compressedEt() << ", TS3 = " << digi->second.sample(3).compressedEt() << std::endl;
+	//	if (tp_ieta_ == 1 && tp_iphi_ == 1) { 
+	if (tp_ieta_ == 1 && tp_iphi_ == 1 && (event.id().event() == 8000 || event.id().event() == 9149|| event.id().event() == 2050 || event.id().event() == 5608 || event.id().event() == 5609 || event.id().event() == 3031)) {
+	  std::cout << "digi->second.sample(TS).compressedEt() energy for TS0 = " << digi->second.sample(0).compressedEt() << ", TS1 = " << digi->second.sample(1).compressedEt() << ", TS2 = SOI = " << digi->second.sample(2).compressedEt() << " = " << digi->second.SOI_compressedEt() << ", TS3 = " << digi->second.sample(3).compressedEt() << std::endl;
 	   std::cout << "fine grain bits in TS0 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(0).fineGrain(0) << ", " << digi->second.sample(0).fineGrain(1) << ", " << digi->second.sample(0).fineGrain(2) << ", " << digi->second.sample(0).fineGrain(3) << std::endl;
 	   std::cout << "fine grain bits in TS1 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(1).fineGrain(0) << ", " << digi->second.sample(1).fineGrain(1) << ", " << digi->second.sample(1).fineGrain(2) << ", " << digi->second.sample(1).fineGrain(3) << std::endl;
 	   std::cout << "fine grain bits in TS2 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(2).fineGrain(0) << ", " << digi->second.sample(2).fineGrain(1) << ", " << digi->second.sample(2).fineGrain(2) << ", " << digi->second.sample(2).fineGrain(3) << std::endl;
@@ -340,10 +345,13 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
 		 if (id.ieta() == 1 && id.iphi() == 1) finegrain_vs_event_ieta1_->Fill(event.id().event(),fgbit + SOI*3);
 	       }
 	     }
-	     if (digi->second.sample(SOI).compressedEt() > 0) energy_vs_event_->Fill(event.id().event(),SOI*3 + 1); // 1, 4, 7, 10
+	     if (digi->second.sample(SOI).compressedEt() > 0) {
+	       energy_vs_event_->Fill(event.id().event(),SOI*3 + 1); // 1, 4, 7, 10
+	       if (id.ieta() == 1 && id.iphi() == 1) energy_vs_event_ieta1_->Fill(event.id().event(),SOI*3 + 1);
+	     }
 	   }
 	   SOIenergy_vs_event_->Fill(event.id().event(),digi->second.SOI_compressedEt());
-
+	   
 	 }
          for (unsigned int i = 0; i < tp_fg_soi_.size(); ++i)
 	   tp_fg_soi_[i] = digi->second.t0().fineGrain(i);
@@ -354,79 +362,82 @@ CompareTP::analyze(const edm::Event& event, const edm::EventSetup& setup)
          for (unsigned int i = 0; i < tp_fg_soi3_.size(); ++i)
            tp_fg_soi3_[i] = digi->second.sample(3).fineGrain(i);
          for (unsigned int i = 0; i < tp_adc_.size(); ++i)
-            tp_adc_[i] = digi->second[i].compressedEt();
+	   tp_adc_[i] = digi->second[i].compressedEt();
       } else {
-         tp_soi_ = 0;
-         tp_npresamples_ = 0;
-         tp_et_ = 0;
-         tp_zsMarkAndPass_ = 0;
-         for (unsigned int i = 0; i < tp_fg_soi_.size(); ++i)
-            tp_fg_soi_[i] = 0;
-         for (unsigned int i = 0; i < tp_adc_.size(); ++i)
-            tp_adc_[i] = 0;
+	tp_soi_ = 0;
+	tp_npresamples_ = 0;
+	tp_et_ = 0;
+	tp_zsMarkAndPass_ = 0;
+	for (unsigned int i = 0; i < tp_fg_soi_.size(); ++i)
+	  tp_fg_soi_[i] = 0;
+	for (unsigned int i = 0; i < tp_adc_.size(); ++i)
+	  tp_adc_[i] = 0;
       }
       auto new_id(id);
       if (swap_iphi_ and id.version() == 1 and id.ieta() > 28 and id.ieta() < 40) {
-         if (id.iphi() % 4 == 1)
-            new_id = HcalTrigTowerDetId(id.ieta(), (id.iphi() + 70) % 72, id.depth(), id.version());
-         else
-            new_id = HcalTrigTowerDetId(id.ieta(), (id.iphi() + 2) % 72 , id.depth(), id.version());
+	if (id.iphi() % 4 == 1)
+	  new_id = HcalTrigTowerDetId(id.ieta(), (id.iphi() + 70) % 72, id.depth(), id.version());
+	else
+	  new_id = HcalTrigTowerDetId(id.ieta(), (id.iphi() + 2) % 72 , id.depth(), id.version());
       }
       if ((digi = eds.find(new_id)) != eds.end()) {
-
-	if (tp_ieta_ == 1 && tp_iphi_ == 1 && ((event.id().event() > 8000 && event.id().event() < 8020) || (event.id().event() > 3000 && event.id().event() < 3020) || (event.id().event() > 6050 && event.id().event() < 6070))) {
-	   std::cout << "emul digi->second.sample(TS).compressedEt() energy for TS0 = " << digi->second.sample(0).compressedEt() << ", TS1 = " << digi->second.sample(1).compressedEt() << ", TS2 = SOI = " << digi->second.sample(2).compressedEt() << " = " << digi->second.SOI_compressedEt() << ", TS3 = " << digi->second.sample(3).compressedEt() << std::endl;
-	   std::cout <<"emul fine grain bits in TS0 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(0).fineGrain(0) << ", " << digi->second.sample(0).fineGrain(1) << ", " << digi->second.sample(0).fineGrain(2) << ", " << digi->second.sample(0).fineGrain(3) << std::endl;
-	   std::cout << "emul fine grain bits in TS1 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(1).fineGrain(0) << ", " << digi->second.sample(1).fineGrain(1) << ", " << digi->second.sample(1).fineGrain(2) << ", " << digi->second.sample(1).fineGrain(3) << std::endl;
-	   std::cout << "emul fine grain bits in TS2 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(2).fineGrain(0) << ", " << digi->second.sample(2).fineGrain(1) << ", " << digi->second.sample(2).fineGrain(2) << ", " << digi->second.sample(2).fineGrain(3) << std::endl;
-	   std::cout << "emul fine grain bits in TS3 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(3).fineGrain(0) << ", " << digi->second.sample(3).fineGrain(1) << ", " << digi->second.sample(3).fineGrain(2) << ", " << digi->second.sample(3).fineGrain(3) << std::endl;
-	 }
-
-	 tp_soi_emul_ = digi->second.SOI_compressedEt();
-         tp_soi_emul_soi0_ = digi->second.sample(0).compressedEt();
-         tp_soi_emul_soi1_ = digi->second.sample(1).compressedEt();
-         tp_soi_emul_soi3_ = digi->second.sample(3).compressedEt();
-         tp_npresamples_emul_ = digi->second.presamples();
-         tp_zsMarkAndPass_emul_ = digi->second.zsMarkAndPass();
-         tp_et_emul_ = decoder->hcaletValue(id, digi->second.t0());
-
-	 tp_fgs_emul_s0_ = digi->second.sample(0).fineGrain(1) + 2 * digi->second.sample(0).fineGrain(2) + 4 * digi->second.sample(0).fineGrain(3);
-	 tp_fgs_emul_s1_ = digi->second.sample(1).fineGrain(1) + 2 * digi->second.sample(1).fineGrain(2) + 4 * digi->second.sample(1).fineGrain(3);
-	 tp_fgs_emul_s2_ = digi->second.sample(2).fineGrain(1) + 2 * digi->second.sample(2).fineGrain(2) + 4 * digi->second.sample(2).fineGrain(3);
-	 tp_fgs_emul_s3_ = digi->second.sample(3).fineGrain(1) + 2 * digi->second.sample(3).fineGrain(2) + 4 * digi->second.sample(3).fineGrain(3);
-	 tp_fgs_emul_s4_ = digi->second.sample(4).fineGrain(1) + 2 * digi->second.sample(4).fineGrain(2) + 4 * digi->second.sample(4).fineGrain(3);
-	 
-	 if ( abs(id.ieta()) <= 15 ) {
-	   for (int SOI_emul = 0; SOI_emul < 5; SOI_emul++) {
-	     for (int fgbit_emul = 1; fgbit_emul < 4; fgbit_emul++) {
-	       if (digi->second.sample(SOI_emul).fineGrain(fgbit_emul) == 1) {
-		 finegrain_emul_vs_event_->Fill(event.id().event(),fgbit_emul + SOI_emul*3);
-                 if (id.ieta() == 1 && id.iphi() == 1) finegrain_emul_vs_event_ieta1_->Fill(event.id().event(),fgbit_emul + SOI_emul*3);
-	       }
-	     }
-	     if (digi->second.sample(SOI_emul).compressedEt() > 0) energy_emul_vs_event_->Fill(event.id().event(),SOI_emul*3 + 1); // 1, 4, 7, 10
-	   }
-           SOIenergy_emul_vs_event_->Fill(event.id().event(),digi->second.SOI_compressedEt());
-	 }
-         for (unsigned int i = 0; i < tp_fg_emul_soi_.size(); ++i)
-            tp_fg_emul_soi_[i] = digi->second.t0().fineGrain(i);
-         for (unsigned int i = 0; i < tp_fg_emul_soi0_.size(); ++i)
-	   tp_fg_emul_soi0_[i] = digi->second.sample(0).fineGrain(i);
-         for (unsigned int i = 0; i < tp_fg_emul_soi1_.size(); ++i)
-           tp_fg_emul_soi1_[i] = digi->second.sample(1).fineGrain(i);
-         for (unsigned int i = 0; i < tp_fg_emul_soi3_.size(); ++i)
-           tp_fg_emul_soi3_[i] = digi->second.sample(3).fineGrain(i);
-         for (unsigned int i = 0; i < tp_adc_emul_.size(); ++i)
-            tp_adc_emul_[i] = digi->second[i].compressedEt();
+	
+        if (tp_ieta_ == 1 && tp_iphi_ == 1 && (event.id().event() == 8000 || event.id().event() == 9149|| event.id().event() == 2050 || event.id().event() == 5608 || event.id().event() == 5609 || event.id().event() == 3031)) {
+	  std::cout << "emul digi->second.sample(TS).compressedEt() energy for TS0 = " << digi->second.sample(0).compressedEt() << ", TS1 = " << digi->second.sample(1).compressedEt() << ", TS2 = SOI = " << digi->second.sample(2).compressedEt() << " = " << digi->second.SOI_compressedEt() << ", TS3 = " << digi->second.sample(3).compressedEt() << std::endl;
+	  std::cout <<"emul fine grain bits in TS0 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(0).fineGrain(0) << ", " << digi->second.sample(0).fineGrain(1) << ", " << digi->second.sample(0).fineGrain(2) << ", " << digi->second.sample(0).fineGrain(3) << std::endl;
+	  std::cout << "emul fine grain bits in TS1 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(1).fineGrain(0) << ", " << digi->second.sample(1).fineGrain(1) << ", " << digi->second.sample(1).fineGrain(2) << ", " << digi->second.sample(1).fineGrain(3) << std::endl;
+	  std::cout << "emul fine grain bits in TS2 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(2).fineGrain(0) << ", " << digi->second.sample(2).fineGrain(1) << ", " << digi->second.sample(2).fineGrain(2) << ", " << digi->second.sample(2).fineGrain(3) << std::endl;
+	  std::cout << "emul fine grain bits in TS3 = fg0, fg1, fg2, fg3 =  " << digi->second.sample(3).fineGrain(0) << ", " << digi->second.sample(3).fineGrain(1) << ", " << digi->second.sample(3).fineGrain(2) << ", " << digi->second.sample(3).fineGrain(3) << std::endl;
+	}
+	
+	tp_soi_emul_ = digi->second.SOI_compressedEt();
+	tp_soi_emul_soi0_ = digi->second.sample(0).compressedEt();
+	tp_soi_emul_soi1_ = digi->second.sample(1).compressedEt();
+	tp_soi_emul_soi3_ = digi->second.sample(3).compressedEt();
+	tp_npresamples_emul_ = digi->second.presamples();
+	tp_zsMarkAndPass_emul_ = digi->second.zsMarkAndPass();
+	tp_et_emul_ = decoder->hcaletValue(id, digi->second.t0());
+	
+	tp_fgs_emul_s0_ = digi->second.sample(0).fineGrain(1) + 2 * digi->second.sample(0).fineGrain(2) + 4 * digi->second.sample(0).fineGrain(3);
+	tp_fgs_emul_s1_ = digi->second.sample(1).fineGrain(1) + 2 * digi->second.sample(1).fineGrain(2) + 4 * digi->second.sample(1).fineGrain(3);
+	tp_fgs_emul_s2_ = digi->second.sample(2).fineGrain(1) + 2 * digi->second.sample(2).fineGrain(2) + 4 * digi->second.sample(2).fineGrain(3);
+	tp_fgs_emul_s3_ = digi->second.sample(3).fineGrain(1) + 2 * digi->second.sample(3).fineGrain(2) + 4 * digi->second.sample(3).fineGrain(3);
+	tp_fgs_emul_s4_ = digi->second.sample(4).fineGrain(1) + 2 * digi->second.sample(4).fineGrain(2) + 4 * digi->second.sample(4).fineGrain(3);
+	
+	if ( abs(id.ieta()) <= 15 ) {
+	  for (int SOI_emul = 0; SOI_emul < 5; SOI_emul++) {
+	    for (int fgbit_emul = 1; fgbit_emul < 4; fgbit_emul++) {
+	      if (digi->second.sample(SOI_emul).fineGrain(fgbit_emul) == 1) {
+		finegrain_emul_vs_event_->Fill(event.id().event(),fgbit_emul + SOI_emul*3);
+		if (id.ieta() == 1 && id.iphi() == 1) finegrain_emul_vs_event_ieta1_->Fill(event.id().event(),fgbit_emul + SOI_emul*3);
+	      }
+	    }
+	    if (digi->second.sample(SOI_emul).compressedEt() > 0) {
+	      energy_emul_vs_event_->Fill(event.id().event(),SOI_emul*3 + 1); // 1, 4, 7, 10
+	      if (id.ieta() == 1 && id.iphi() == 1) energy_emul_vs_event_ieta1_->Fill(event.id().event(),SOI_emul*3 + 1);
+	    }
+	  }
+	  SOIenergy_emul_vs_event_->Fill(event.id().event(),digi->second.SOI_compressedEt());
+	}
+	for (unsigned int i = 0; i < tp_fg_emul_soi_.size(); ++i)
+	  tp_fg_emul_soi_[i] = digi->second.t0().fineGrain(i);
+	for (unsigned int i = 0; i < tp_fg_emul_soi0_.size(); ++i)
+	  tp_fg_emul_soi0_[i] = digi->second.sample(0).fineGrain(i);
+	for (unsigned int i = 0; i < tp_fg_emul_soi1_.size(); ++i)
+	  tp_fg_emul_soi1_[i] = digi->second.sample(1).fineGrain(i);
+	for (unsigned int i = 0; i < tp_fg_emul_soi3_.size(); ++i)
+	  tp_fg_emul_soi3_[i] = digi->second.sample(3).fineGrain(i);
+	for (unsigned int i = 0; i < tp_adc_emul_.size(); ++i)
+	  tp_adc_emul_[i] = digi->second[i].compressedEt();
       } else {
-         tp_soi_emul_ = 0;
-         tp_npresamples_emul_ = 0;
-         tp_et_emul_ = 0;
-         tp_zsMarkAndPass_emul_ = 0;
-         for (unsigned int i = 0; i < tp_fg_emul_soi_.size(); ++i)
-            tp_fg_emul_soi_[i] = 0;
-         for (unsigned int i = 0; i < tp_adc_emul_.size(); ++i)
-            tp_adc_emul_[i] = 0;
+	tp_soi_emul_ = 0;
+	tp_npresamples_emul_ = 0;
+	tp_et_emul_ = 0;
+	tp_zsMarkAndPass_emul_ = 0;
+	for (unsigned int i = 0; i < tp_fg_emul_soi_.size(); ++i)
+	  tp_fg_emul_soi_[i] = 0;
+	for (unsigned int i = 0; i < tp_adc_emul_.size(); ++i)
+	  tp_adc_emul_[i] = 0;
       }
       tps_->Fill();
    }
