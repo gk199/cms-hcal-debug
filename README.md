@@ -12,6 +12,8 @@ scp "gkopp@lxplus.cern.ch:/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_12_3_0/src/Debug/
 ```
 `CompareTP` and	`AnalyzeTP` change what is saved in root file, `CompareDataEmul` does the data-emulator comparison plots.
 
+This is helpful for analyzing the fine grain bits from a LED scan taken at P5. The raw TDC information is analyzed in `/afs/cern.ch/work/g/gkopp/MWGR/CMSSW_12_0_0/src/HCALPFG` and connected to the github [here](https://github.com/gk199/P5_HCAL_RawData).
+
 # Setup
 
 Install with:
